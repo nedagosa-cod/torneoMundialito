@@ -1,0 +1,236 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Outfit:wght@400;600;700;800;900&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* ================================================
+   BASE RESETS & GLOBAL
+   ================================================ */
+*, *::before, *::after {
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+  -webkit-tap-highlight-color: transparent;
+}
+
+body {
+  margin: 0;
+  padding: 0;
+  font-family: 'Inter', system-ui, sans-serif;
+  background: #020c06;
+  color: #f0fdf4;
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+
+#root {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+/* ================================================
+   SCROLLBAR CUSTOM
+   ================================================ */
+::-webkit-scrollbar {
+  width: 4px;
+}
+::-webkit-scrollbar-track {
+  background: #020c06;
+}
+::-webkit-scrollbar-thumb {
+  background: #16a34a;
+  border-radius: 2px;
+}
+
+/* ================================================
+   GLASS CARD COMPONENT
+   ================================================ */
+@layer components {
+  .glass-card {
+    @apply backdrop-blur-md border border-white/10 rounded-2xl;
+    background: linear-gradient(135deg, rgba(255,255,255,0.07) 0%, rgba(255,255,255,0.02) 100%);
+  }
+
+  .glass-card-hover {
+    @apply glass-card transition-all duration-300;
+  }
+  .glass-card-hover:hover {
+    background: linear-gradient(135deg, rgba(255,255,255,0.12) 0%, rgba(255,255,255,0.05) 100%);
+    border-color: rgba(34, 197, 94, 0.3);
+    transform: translateY(-2px);
+    box-shadow: 0 12px 40px rgba(0,0,0,0.5), 0 0 20px rgba(34,197,94,0.1);
+  }
+
+  .btn-primary {
+    @apply relative font-display font-bold text-sm px-6 py-3 rounded-xl
+           transition-all duration-200 active:scale-95 disabled:opacity-50
+           disabled:cursor-not-allowed overflow-hidden;
+    background: linear-gradient(135deg, #22c55e, #16a34a);
+    box-shadow: 0 4px 15px rgba(34,197,94,0.4);
+    color: white;
+  }
+  .btn-primary:hover:not(:disabled) {
+    transform: translateY(-1px);
+    box-shadow: 0 6px 20px rgba(34,197,94,0.6);
+  }
+
+  .btn-gold {
+    @apply relative font-display font-bold text-sm px-6 py-3 rounded-xl
+           transition-all duration-200 active:scale-95 disabled:opacity-50
+           disabled:cursor-not-allowed overflow-hidden;
+    background: linear-gradient(135deg, #fbbf24, #f59e0b);
+    box-shadow: 0 4px 15px rgba(251,191,36,0.4);
+    color: #1a0a00;
+  }
+  .btn-gold:hover:not(:disabled) {
+    transform: translateY(-1px);
+    box-shadow: 0 6px 20px rgba(251,191,36,0.6);
+  }
+
+  .btn-ghost {
+    @apply px-6 py-3 rounded-xl font-semibold text-sm border border-white/20
+           text-white/70 hover:text-white hover:border-white/40
+           transition-all duration-200 active:scale-95;
+  }
+
+  .input-field {
+    @apply w-full bg-white/5 border border-white/15 rounded-xl px-4 py-3
+           text-white placeholder-white/30 outline-none
+           transition-all duration-200 font-medium;
+  }
+  .input-field:focus {
+    border-color: rgba(34, 197, 94, 0.6);
+    box-shadow: 0 0 0 3px rgba(34, 197, 94, 0.15);
+    background: rgba(255,255,255,0.08);
+  }
+
+  .score-input {
+    @apply w-14 h-14 text-center text-2xl font-display font-bold
+           bg-white/10 border-2 border-white/20 rounded-xl outline-none
+           text-white transition-all duration-200;
+    -moz-appearance: textfield;
+  }
+  .score-input::-webkit-outer-spin-button,
+  .score-input::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+  }
+  .score-input:focus {
+    border-color: rgba(34, 197, 94, 0.8);
+    box-shadow: 0 0 0 3px rgba(34, 197, 94, 0.2), 0 0 15px rgba(34, 197, 94, 0.3);
+    background: rgba(255,255,255,0.15);
+  }
+
+  .badge-exact {
+    @apply inline-flex items-center gap-1 px-3 py-1 rounded-full text-xs font-bold;
+    background: linear-gradient(135deg, #fbbf24, #f59e0b);
+    color: #1a0a00;
+    box-shadow: 0 0 12px rgba(251,191,36,0.5);
+  }
+
+  .badge-outcome {
+    @apply inline-flex items-center gap-1 px-3 py-1 rounded-full text-xs font-bold;
+    background: linear-gradient(135deg, #22c55e, #16a34a);
+    color: white;
+    box-shadow: 0 0 12px rgba(34,197,94,0.4);
+  }
+
+  .badge-miss {
+    @apply inline-flex items-center gap-1 px-3 py-1 rounded-full text-xs font-bold
+           bg-white/10 text-white/50;
+  }
+
+  .nav-tab {
+    @apply flex flex-col items-center gap-1 py-2 px-4 rounded-xl
+           transition-all duration-200 cursor-pointer;
+  }
+  .nav-tab.active {
+    background: rgba(34, 197, 94, 0.15);
+    color: #22c55e;
+  }
+  .nav-tab:not(.active) {
+    color: rgba(255,255,255,0.4);
+  }
+  .nav-tab:hover:not(.active) {
+    color: rgba(255,255,255,0.7);
+    background: rgba(255,255,255,0.05);
+  }
+
+  .shimmer-bg {
+    background: linear-gradient(90deg,
+      rgba(255,255,255,0.03) 25%,
+      rgba(255,255,255,0.08) 50%,
+      rgba(255,255,255,0.03) 75%
+    );
+    background-size: 200% 100%;
+    animation: shimmer 1.5s infinite;
+  }
+}
+
+/* ================================================
+   STADIUM BACKGROUND PATTERN
+   ================================================ */
+.stadium-bg {
+  position: relative;
+  overflow: hidden;
+}
+.stadium-bg::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(ellipse at 20% 50%, rgba(22,163,74,0.08) 0%, transparent 60%),
+    radial-gradient(ellipse at 80% 50%, rgba(22,163,74,0.06) 0%, transparent 60%),
+    radial-gradient(ellipse at 50% 0%, rgba(251,191,36,0.05) 0%, transparent 50%);
+  pointer-events: none;
+  z-index: 0;
+}
+.stadium-bg > * {
+  position: relative;
+  z-index: 1;
+}
+
+/* ================================================
+   CONFETTI ANIMATION (JS-generated)
+   ================================================ */
+.confetti-piece {
+  position: fixed;
+  width: 8px;
+  height: 8px;
+  border-radius: 2px;
+  animation: confetti-fall 1.5s ease-in forwards;
+  pointer-events: none;
+  z-index: 9999;
+}
+@keyframes confetti-fall {
+  0%   { transform: translateY(-20px) rotate(0deg); opacity: 1; }
+  100% { transform: translateY(100vh) rotate(720deg); opacity: 0; }
+}
+
+/* ================================================
+   LEADERBOARD RANK BADGES
+   ================================================ */
+.rank-1 {
+  background: linear-gradient(135deg, #fbbf24, #f59e0b);
+  color: #1a0a00;
+  box-shadow: 0 0 15px rgba(251,191,36,0.6);
+}
+.rank-2 {
+  background: linear-gradient(135deg, #e2e8f0, #94a3b8);
+  color: #1a1a2e;
+}
+.rank-3 {
+  background: linear-gradient(135deg, #cd7f32, #a0522d);
+  color: white;
+}
+
+/* ================================================
+   PAGE TRANSITIONS
+   ================================================ */
+.page-enter {
+  animation: slide-up 0.35s ease-out;
+}
