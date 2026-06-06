@@ -62,10 +62,10 @@ export const LeaderboardPage: React.FC = () => {
                 className="w-14 h-14 rounded-full flex items-center justify-center text-2xl font-display font-black border-2"
                 style={{ borderColor: '#94a3b8', background: 'rgba(148,163,184,0.1)' }}
               >
-                {leaderboard[1]?.username[0]?.toUpperCase()}
+                {leaderboard[1]?.firstName?.[0]?.toUpperCase() || leaderboard[1]?.username[0]?.toUpperCase()}
               </div>
               <p className="text-xs font-bold text-white/70 truncate w-full text-center">
-                {leaderboard[1]?.username}
+                {leaderboard[1]?.firstName || leaderboard[1]?.username}
               </p>
               <p className="text-sm font-display font-black" style={{ color: '#94a3b8' }}>
                 {leaderboard[1]?.totalPoints} pts
@@ -91,10 +91,10 @@ export const LeaderboardPage: React.FC = () => {
                   boxShadow: '0 0 20px rgba(251,191,36,0.4)',
                 }}
               >
-                {leaderboard[0]?.username[0]?.toUpperCase()}
+                {leaderboard[0]?.firstName?.[0]?.toUpperCase() || leaderboard[0]?.username[0]?.toUpperCase()}
               </div>
               <p className="text-sm font-bold text-dorado-400 truncate w-full text-center">
-                {leaderboard[0]?.username}
+                {leaderboard[0]?.firstName || leaderboard[0]?.username}
               </p>
               <p className="text-base font-display font-black text-dorado-400">
                 {leaderboard[0]?.totalPoints} pts
@@ -117,10 +117,10 @@ export const LeaderboardPage: React.FC = () => {
                 className="w-14 h-14 rounded-full flex items-center justify-center text-2xl font-display font-black border-2"
                 style={{ borderColor: '#cd7f32', background: 'rgba(205,127,50,0.1)' }}
               >
-                {leaderboard[2]?.username[0]?.toUpperCase()}
+                {leaderboard[2]?.firstName?.[0]?.toUpperCase() || leaderboard[2]?.username[0]?.toUpperCase()}
               </div>
               <p className="text-xs font-bold text-white/70 truncate w-full text-center">
-                {leaderboard[2]?.username}
+                {leaderboard[2]?.firstName || leaderboard[2]?.username}
               </p>
               <p className="text-sm font-display font-black" style={{ color: '#cd7f32' }}>
                 {leaderboard[2]?.totalPoints} pts

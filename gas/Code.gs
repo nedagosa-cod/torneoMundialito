@@ -9,6 +9,7 @@ const SHEET_USERS       = 'Users';
 const SHEET_MATCHES     = 'Matches';
 const SHEET_PREDICTIONS = 'Predictions';
 const SHEET_SYNC_LOG    = 'SyncLog';     // Hoja de log de sincronizaciones
+const SHEET_FORM_RESPONSES = 'Respuestas de formulario 1'; // Respuestas de Google Forms
 const ADMIN_PASSWORD    = 'mundia2026';
 
 // API externa deshabilitada
@@ -190,45 +191,115 @@ function handleSyncFromAdmin(adminPassword) {
 }
 
 // ============================================================
+//  SINCRONIZACIÓN DE USUARIOS DESDE GOOGLE FORMS
+//  Lee la hoja "Respuestas de formulario 1" y sincroniza
+//  con la hoja Users.
+//  Columnas del formulario:
+//    A: Marca temporal
+//    B: Número de cédula
+//    C: Nombre completo
+//    D: Número de celular
+//    E: Correo electrónico
+//    F: Gerencia
+// ============================================================
+
+function syncUsersFromFormResponses() {
+  var ss;
+  try {
+    ss = (SPREADSHEET_ID && SPREADSHEET_ID !== 'TU_SPREADSHEET_ID_AQUI')
+      ? SpreadsheetApp.openById(SPREADSHEET_ID)
+      : SpreadsheetApp.getActiveSpreadsheet();
+  } catch (e) {
+    ss = SpreadsheetApp.getActiveSpreadsheet();
+  }
+
+  var formSheet = ss.getSheetByName(SHEET_FORM_RESPONSES);
+  if (!formSheet) return; // No hay hoja de respuestas
+
+  var formData = formSheet.getDataRange().getValues();
+  if (formData.length <= 1) return; // Solo encabezados
+
+  var userSheet = getSheet(SHEET_USERS);
+  var userData = userSheet.getDataRange().getValues();
+  var userHeaders = userData[0];
+  var uCols = {};
+  userHeaders.forEach(function(h, i) { uCols[h] = i; });
+
+  // Construir mapa de usuarios existentes por cédula (guardada como password)
+  var existingByPassword = {};
+  for (var i = 1; i < userData.length; i++) {
+    var pwd = String(userData[i][uCols.password] || '').trim();
+    if (pwd) existingByPassword[pwd] = i + 1; // row number (1-indexed)
+  }
+
+  // Procesar cada respuesta del formulario
+  for (var r = 1; r < formData.length; r++) {
+    var cedula        = String(formData[r][1] || '').trim(); // Col B
+    var nombreCompleto = String(formData[r][2] || '').trim(); // Col C
+    var correo        = String(formData[r][4] || '').trim(); // Col E
+
+    if (!cedula || !correo) continue; // Saltar registros incompletos
+
+    // Separar nombre completo en firstName y lastName
+    var parts = nombreCompleto.split(/\s+/);
+    var firstName = '';
+    var lastName = '';
+    if (parts.length >= 3) {
+      // Ej: "Nestor David Gomez" -> firstName="Nestor David", lastName="Gomez"
+      firstName = parts.slice(0, parts.length - 1).join(' ');
+      lastName = parts[parts.length - 1];
+    } else if (parts.length === 2) {
+      firstName = parts[0];
+      lastName = parts[1];
+    } else {
+      firstName = nombreCompleto;
+      lastName = '';
+    }
+
+    if (existingByPassword[cedula]) {
+      // Usuario ya existe — actualizar nombre y correo si cambiaron
+      var rowNum = existingByPassword[cedula];
+      userSheet.getRange(rowNum, uCols.firstName + 1).setValue(firstName);
+      userSheet.getRange(rowNum, uCols.lastName + 1).setValue(lastName);
+      userSheet.getRange(rowNum, uCols.username + 1).setValue(correo.toLowerCase());
+    } else {
+      // Crear usuario nuevo
+      var newUserId = generateId('USR');
+      var newRow = [newUserId, firstName, lastName, correo.toLowerCase(), cedula, 0, new Date().toISOString().split('T')[0]];
+      userSheet.appendRow(newRow);
+      existingByPassword[cedula] = userSheet.getLastRow();
+    }
+  }
+}
+
+// ============================================================
 //  HANDLERS — AUTH
 // ============================================================
 
 function handleRegister(body) {
-  const firstName = (body.firstName || '').trim();
-  const lastName  = (body.lastName  || '').trim();
-  const username  = (body.username  || '').trim();
-  const password  = (body.password  || '').trim();
-
-  if (!firstName) return buildError('El nombre es requerido', 400);
-  if (!lastName)  return buildError('El apellido es requerido', 400);
-  if (!username)  return buildError('El nombre de jugador es requerido', 400);
-  if (!password || password.length < 4) return buildError('La contraseña debe tener mínimo 4 caracteres', 400);
-
-  const sheet = getSheet(SHEET_USERS);
-  const users = sheetToObjects(sheet);
-  const exists = users.find(function(u) {
-    return u.username.toLowerCase() === username.toLowerCase();
-  });
-  if (exists) return buildError('Ese nombre de jugador ya está en uso', 409);
-
-  const newUser = {
-    userId: generateId('USR'), firstName: firstName, lastName: lastName,
-    username: username, password: password, totalPoints: 0,
-    createdAt: new Date().toISOString().split('T')[0]
-  };
-  sheet.appendRow([newUser.userId, newUser.firstName, newUser.lastName,
-                   newUser.username, newUser.password, newUser.totalPoints, newUser.createdAt]);
-  return buildSuccess(sanitizeUser(newUser));
+  // Registro deshabilitado — los usuarios se registran via Google Forms
+  return buildError('El registro se realiza exclusivamente a través del formulario de Google Forms proporcionado por la organización.', 403);
 }
 
 function handleLogin(username, password) {
-  if (!username || !password) return buildError('Usuario y contraseña requeridos', 400);
-  const users = sheetToObjects(getSheet(SHEET_USERS));
-  const user = users.find(function(u) {
-    return u.username.toLowerCase() === username.trim().toLowerCase();
+  if (!username || !password) return buildError('Correo y cédula son requeridos', 400);
+
+  // Sincronizar usuarios desde el formulario antes de autenticar
+  try {
+    syncUsersFromFormResponses();
+  } catch (e) {
+    Logger.log('Error en syncUsersFromFormResponses: ' + e.message);
+  }
+
+  var users = sheetToObjects(getSheet(SHEET_USERS));
+  var emailNorm = username.trim().toLowerCase();
+  var cedulaNorm = String(password).trim();
+
+  var user = users.find(function(u) {
+    return String(u.username || '').toLowerCase() === emailNorm;
   });
-  if (!user) return buildError('Usuario no encontrado. ¿Ya te registraste?', 404);
-  if (String(user.password) !== String(password.trim())) return buildError('Contraseña incorrecta', 401);
+  if (!user) return buildError('Correo no encontrado. ¿Ya completaste el formulario de registro?', 404);
+  if (String(user.password || '').trim() !== cedulaNorm) return buildError('Número de cédula incorrecto', 401);
   return buildSuccess(sanitizeUser(user));
 }
 
@@ -244,6 +315,26 @@ function handleSavePrediction(userId, matchId, homeScore, awayScore) {
   const match = matches.find(function(m) { return m.matchId === matchId; });
   if (!match) return buildError('Partido no encontrado', 404);
   if (match.status === 'finished') return buildError('El partido ya terminó', 400);
+
+  // Bloquear predicción si ya comenzó el partido (en base a la fecha y hora de Colombia)
+  if (match.matchDate && match.matchTime) {
+    const dateParts = match.matchDate.split('-'); // YYYY-MM-DD
+    const timeParts = match.matchTime.split(':'); // HH:mm
+    if (dateParts.length === 3 && timeParts.length === 2) {
+      const kickoff = new Date(
+        Number(dateParts[0]),
+        Number(dateParts[1]) - 1,
+        Number(dateParts[2]),
+        Number(timeParts[0]),
+        Number(timeParts[1]),
+        0
+      );
+      const now = new Date();
+      if (now >= kickoff) {
+        return buildError('El partido ya comenzó y las predicciones están cerradas', 400);
+      }
+    }
+  }
 
   const predSheet = getSheet(SHEET_PREDICTIONS);
   const allPreds = sheetToObjects(predSheet);

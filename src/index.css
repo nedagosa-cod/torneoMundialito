@@ -109,8 +109,8 @@ body {
   }
 
   .score-input {
-    @apply w-14 h-14 text-center text-2xl font-display font-bold
-           bg-white/10 border-2 border-white/20 rounded-xl outline-none
+    @apply w-11 h-11 text-center text-lg font-display font-bold
+           bg-white/10 border border-white/20 rounded-xl outline-none
            text-white transition-all duration-200;
     -moz-appearance: textfield;
   }

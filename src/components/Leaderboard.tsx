@@ -56,7 +56,7 @@ const LeaderboardRow: React.FC<LeaderboardRowProps> = ({ entry, isCurrentUser, a
       <div className="flex-1 min-w-0">
         <div className="flex items-center gap-2">
           <p className={`font-bold truncate ${isCurrentUser ? 'text-verde-400' : 'text-white'}`}>
-            {entry.username}
+            {entry.firstName || entry.username}
           </p>
           {isCurrentUser && (
             <span className="text-xs bg-verde-400/20 text-verde-400 px-2 py-0.5 rounded-full font-semibold flex-shrink-0">

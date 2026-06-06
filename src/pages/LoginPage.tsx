@@ -117,22 +117,22 @@ const LoginForm: React.FC<LoginFormProps> = ({ onSwitch }) => {
       <div ref={ref as unknown as React.RefObject<HTMLDivElement>}>
         <Field
           id="login-username"
-          label="Nombre de jugador"
-          placeholder="Ej: ElCrack10"
+          label="Correo electrónico"
+          placeholder="Ej: usuario@correo.com"
           value={username}
           onChange={handleChange(setUsername)}
-          icon="⚽"
-          autoComplete="username"
+          icon="📧"
+          autoComplete="email"
         />
       </div>
       <Field
         id="login-password"
-        label="Contraseña"
+        label="Número de cédula"
         type="password"
-        placeholder="••••••••"
+        placeholder="Ej: 1098769622"
         value={password}
         onChange={handleChange(setPassword)}
-        icon="🔒"
+        icon="🪪"
         autoComplete="current-password"
       />
 
@@ -158,7 +158,7 @@ const LoginForm: React.FC<LoginFormProps> = ({ onSwitch }) => {
             Ingresando...
           </span>
         ) : (
-          '⚽ Ingresar'
+          '📧 Ingresar'
         )}
       </button>
 
@@ -182,146 +182,64 @@ const LoginForm: React.FC<LoginFormProps> = ({ onSwitch }) => {
 // ============================================================
 interface RegisterFormProps { onSwitch: () => void }
 
-const RegisterForm: React.FC<RegisterFormProps> = ({ onSwitch }) => {
-  const [firstName, setFirstName]   = useState('');
-  const [lastName, setLastName]     = useState('');
-  const [username, setUsername]     = useState('');
-  const [password, setPassword]     = useState('');
-  const [confirmPwd, setConfirmPwd] = useState('');
-  const [localError, setLocalError] = useState('');
-  const { register, isLoading, error, clearError } = useStore();
-
-  const handleChange = (setter: React.Dispatch<React.SetStateAction<string>>) => (v: string) => {
-    setter(v);
-    setLocalError('');
-    if (error) clearError();
-  };
-
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setLocalError('');
-
-    if (!firstName.trim()) { setLocalError('El nombre es requerido'); return; }
-    if (!lastName.trim())  { setLocalError('El apellido es requerido'); return; }
-    if (!username.trim())  { setLocalError('El nombre de jugador es requerido'); return; }
-    if (username.trim().length < 3) { setLocalError('El nombre de jugador debe tener mínimo 3 caracteres'); return; }
-    if (!password)         { setLocalError('La contraseña es requerida'); return; }
-    if (password.length < 4) { setLocalError('La contraseña debe tener mínimo 4 caracteres'); return; }
-    if (password !== confirmPwd) { setLocalError('Las contraseñas no coinciden'); return; }
-
-    await register(firstName.trim(), lastName.trim(), username.trim(), password);
-  };
-
-  const displayError = localError || error;
-
-  const isComplete = firstName && lastName && username.length >= 3 && password.length >= 4 && confirmPwd;
-
+const RegisterInfo: React.FC<RegisterFormProps> = ({ onSwitch }) => {
   return (
-    <form onSubmit={handleSubmit} className="space-y-3.5 animate-fade-in">
-      <div className="grid grid-cols-2 gap-3">
-        <Field
-          id="reg-firstname"
-          label="Nombre"
-          placeholder="Ej: Juan"
-          value={firstName}
-          onChange={handleChange(setFirstName)}
-          icon="👤"
-          autoComplete="given-name"
-          maxLength={30}
-        />
-        <Field
-          id="reg-lastname"
-          label="Apellido"
-          placeholder="Ej: García"
-          value={lastName}
-          onChange={handleChange(setLastName)}
-          icon="👤"
-          autoComplete="family-name"
-          maxLength={30}
-        />
+    <div className="space-y-5 animate-fade-in">
+      {/* Icono decorativo */}
+      <div className="flex justify-center">
+        <div
+          className="w-16 h-16 rounded-2xl flex items-center justify-center"
+          style={{
+            background: 'linear-gradient(135deg, rgba(251,191,36,0.15), rgba(34,197,94,0.1))',
+            border: '1px solid rgba(251,191,36,0.25)',
+            boxShadow: '0 0 20px rgba(251,191,36,0.1)',
+          }}
+        >
+          <span className="text-3xl select-none">📋</span>
+        </div>
       </div>
 
-      <Field
-        id="reg-username"
-        label="Nombre de jugador"
-        placeholder="Ej: Crack10, ElMessi..."
-        value={username}
-        onChange={handleChange(setUsername)}
-        icon="⭐"
-        autoComplete="username"
-        maxLength={20}
-      />
-      {username && username.length < 3 && (
-        <p className="text-dorado-400/70 text-xs -mt-2 ml-1">Mínimo 3 caracteres</p>
-      )}
-
-      <Field
-        id="reg-password"
-        label="Contraseña"
-        type="password"
-        placeholder="Mínimo 4 caracteres"
-        value={password}
-        onChange={handleChange(setPassword)}
-        icon="🔒"
-        autoComplete="new-password"
-      />
-
-      <Field
-        id="reg-confirm-password"
-        label="Confirmar contraseña"
-        type="password"
-        placeholder="Repite tu contraseña"
-        value={confirmPwd}
-        onChange={handleChange(setConfirmPwd)}
-        icon="🔑"
-        autoComplete="new-password"
-      />
-
-      {/* Indicador de coincidencia de contraseñas */}
-      {confirmPwd && (
-        <p className={`text-xs font-semibold -mt-2 ml-1 ${password === confirmPwd ? 'text-verde-400' : 'text-red-400'}`}>
-          {password === confirmPwd ? '✓ Las contraseñas coinciden' : '✗ No coinciden'}
-        </p>
-      )}
-
-      {displayError && (
-        <div className="flex items-start gap-2 px-3 py-2.5 rounded-xl bg-red-500/10 border border-red-500/20 animate-fade-in">
-          <span className="text-red-400 text-sm mt-0.5">⚠️</span>
-          <p className="text-red-400 text-xs font-medium leading-relaxed">{displayError}</p>
-        </div>
-      )}
-
-      <button
-        id="register-btn"
-        type="submit"
-        disabled={isLoading || !isComplete}
-        className="btn-gold w-full text-base py-3.5 font-display"
+      {/* Mensaje informativo */}
+      <div
+        className="rounded-xl p-4 border border-dorado-400/20"
+        style={{ background: 'rgba(251,191,36,0.05)' }}
       >
-        {isLoading ? (
-          <span className="flex items-center justify-center gap-2">
-            <svg className="animate-spin h-4 w-4" viewBox="0 0 24 24" fill="none">
-              <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
-              <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
-            </svg>
-            Creando cuenta...
-          </span>
-        ) : (
-          '🏆 Crear cuenta'
-        )}
-      </button>
+        <h3 className="text-dorado-400 font-display font-bold text-sm mb-2 text-center">
+          Registro vía Google Forms
+        </h3>
+        <p className="text-white/50 text-xs leading-relaxed text-center">
+          Para participar en la Polla del Mundia, debes completar el
+          <strong className="text-white/70"> formulario de registro</strong> proporcionado
+          por la organización.
+        </p>
+      </div>
 
-      <p className="text-center text-white/30 text-sm">
-        ¿Ya tienes cuenta?{' '}
-        <button
-          type="button"
-          id="switch-to-login"
-          onClick={onSwitch}
-          className="text-verde-400 font-bold hover:text-verde-300 transition-colors"
-        >
-          Inicia sesión
-        </button>
-      </p>
-    </form>
+      {/* Pasos */}
+      <div className="space-y-2.5">
+        <div className="flex items-start gap-3 px-2">
+          <span className="w-6 h-6 rounded-full bg-verde-400/15 border border-verde-400/30 flex items-center justify-center text-xs font-bold text-verde-400 flex-shrink-0">1</span>
+          <p className="text-white/50 text-xs leading-relaxed pt-0.5">Completa el formulario de Google Forms que te compartieron</p>
+        </div>
+        <div className="flex items-start gap-3 px-2">
+          <span className="w-6 h-6 rounded-full bg-verde-400/15 border border-verde-400/30 flex items-center justify-center text-xs font-bold text-verde-400 flex-shrink-0">2</span>
+          <p className="text-white/50 text-xs leading-relaxed pt-0.5">Usa tu <strong className="text-white/70">correo electrónico</strong> y <strong className="text-white/70">número de cédula</strong> para ingresar</p>
+        </div>
+        <div className="flex items-start gap-3 px-2">
+          <span className="w-6 h-6 rounded-full bg-verde-400/15 border border-verde-400/30 flex items-center justify-center text-xs font-bold text-verde-400 flex-shrink-0">3</span>
+          <p className="text-white/50 text-xs leading-relaxed pt-0.5">¡Comienza a predecir y gana puntos! 🎉</p>
+        </div>
+      </div>
+
+      {/* Botón para ir al login */}
+      <button
+        type="button"
+        id="go-to-login-btn"
+        onClick={onSwitch}
+        className="btn-primary w-full text-base py-3.5 font-display"
+      >
+        📧 Ya tengo cuenta · Ingresar
+      </button>
+    </div>
   );
 };
 
@@ -425,7 +343,7 @@ export const LoginPage: React.FC = () => {
           {mode === 'login' ? (
             <LoginForm onSwitch={() => switchMode('register')} />
           ) : (
-            <RegisterForm onSwitch={() => switchMode('login')} />
+            <RegisterInfo onSwitch={() => switchMode('login')} />
           )}
         </div>
 

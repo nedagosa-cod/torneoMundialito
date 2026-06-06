@@ -541,7 +541,7 @@ export const AdminPage: React.FC = () => {
           <div className="flex items-center justify-between mb-4">
             <div>
               <h1 className="font-display font-black text-2xl" style={{ color: '#fbbf24' }}>🛡️ Admin</h1>
-              <p className="text-white/30 text-xs">{user?.username} · {matches.length} partidos cargados</p>
+              <p className="text-white/30 text-xs">{user?.firstName || user?.username} · {matches.length} partidos cargados</p>
             </div>
             <button id="admin-logout-btn" onClick={handleLogout}
               className="text-xs px-3 py-1.5 rounded-xl bg-white/5 hover:bg-white/10 text-white/40 hover:text-white/70 transition-all border border-white/10">

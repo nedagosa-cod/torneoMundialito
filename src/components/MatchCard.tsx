@@ -6,21 +6,70 @@ import { getPointsResult } from '../types';
 import { PointsBadge, StatusBadge } from './ui/Badge';
 import { Button } from './ui/Button';
 
-// Mapa de banderas por equipo (emojis)
-const FLAG_MAP: Record<string, string> = {
-  Argentina: '🇦🇷', Brazil: '🇧🇷', France: '🇫🇷', Germany: '🇩🇪',
-  Spain: '🇪🇸', England: '🏴󠁧󠁢󠁥󠁮󠁧󠁿', Portugal: '🇵🇹', Netherlands: '🇳🇱',
-  Italy: '🇮🇹', Belgium: '🇧🇪', Uruguay: '🇺🇾', Colombia: '🇨🇴',
-  Mexico: '🇲🇽', USA: '🇺🇸', Japan: '🇯🇵', Morocco: '🇲🇦',
-  Senegal: '🇸🇳', Croatia: '🇭🇷', Poland: '🇵🇱', Switzerland: '🇨🇭',
-  Denmark: '🇩🇰', Sweden: '🇸🇪', Chile: '🇨🇱', Ecuador: '🇪🇨',
-  Peru: '🇵🇪', Venezuela: '🇻🇪', Bolivia: '🇧🇴', Paraguay: '🇵🇾',
-  Australia: '🇦🇺', 'South Korea': '🇰🇷', Qatar: '🇶🇦', 'Saudi Arabia': '🇸🇦',
-  Canada: '🇨🇦', 'New Zealand': '🇳🇿', Ghana: '🇬🇭', Nigeria: '🇳🇬',
+const FLAG_CODE_MAP: Record<string, string> = {
+  'Alemania': 'de',
+  'Argelia': 'dz',
+  'Argentina': 'ar',
+  'Arabia Saudita': 'sa',
+  'Australia': 'au',
+  'Austria': 'at',
+  'Bélgica': 'be',
+  'Bosnia y Herzegovina': 'ba',
+  'Brasil': 'br',
+  'Cabo Verde': 'cv',
+  'Canadá': 'ca',
+  'Catar': 'qa',
+  'Colombia': 'co',
+  'Corea del Sur': 'kr',
+  'Costa de Marfil': 'ci',
+  'Croacia': 'hr',
+  'Curazao': 'cw',
+  'República Checa': 'cz',
+  'Ecuador': 'ec',
+  'Egipto': 'eg',
+  'Inglaterra': 'gb-eng',
+  'Escocia': 'gb-sct',
+  'España': 'es',
+  'Estados Unidos': 'us',
+  'Francia': 'fr',
+  'Ghana': 'gh',
+  'Haití': 'ht',
+  'Irán': 'ir',
+  'Irak': 'iq',
+  'Japón': 'jp',
+  'Jordania': 'jo',
+  'México': 'mx',
+  'Marruecos': 'ma',
+  'República Democrática del Congo': 'cd',
+  'Países Bajos': 'nl',
+  'Nueva Zelanda': 'nz',
+  'Noruega': 'no',
+  'Panamá': 'pa',
+  'Paraguay': 'py',
+  'Portugal': 'pt',
+  'Senegal': 'sn',
+  'Sudáfrica': 'za',
+  'Suecia': 'se',
+  'Suiza': 'ch',
+  'Turquía': 'tr',
+  'Túnez': 'tn',
+  'Uruguay': 'uy',
+  'Uzbekistán': 'uz'
 };
 
-function getFlag(team: string): string {
-  return FLAG_MAP[team] || '🏳️';
+function getFlag(team: string): React.ReactNode {
+  const code = FLAG_CODE_MAP[team];
+  if (code) {
+    return (
+      <img
+        src={`https://flagcdn.com/w80/${code}.png`}
+        alt={`Bandera de ${team}`}
+        className="w-9 h-6 object-cover rounded border border-white/10 shadow-sm inline-block"
+        loading="lazy"
+      />
+    );
+  }
+  return <span className="text-2xl">🏆</span>;
 }
 
 function formatMatchDate(dateStr: string, timeStr?: string): string {
@@ -68,7 +117,27 @@ export const MatchCard: React.FC<MatchCardProps> = ({ match }) => {
 
   const pointsResult = getPointsResult(prediction?.points ?? null);
   const isFinished = match.status === 'finished';
-  const canPredict = !isFinished;
+  
+  const [hasStarted, setHasStarted] = useState(false);
+
+  useEffect(() => {
+    const checkHasStarted = () => {
+      if (!match.matchDate || !match.matchTime) return false;
+      // Convertir fecha de Colombia (UTC-5) a objeto Date absoluto
+      const dateIsoStr = `${match.matchDate}T${match.matchTime}:00-05:00`;
+      const kickoff = new Date(dateIsoStr);
+      return Date.now() >= kickoff.getTime();
+    };
+
+    setHasStarted(checkHasStarted());
+    const interval = setInterval(() => {
+      setHasStarted(checkHasStarted());
+    }, 30000); // Chequear cada 30 segundos
+
+    return () => clearInterval(interval);
+  }, [match]);
+
+  const canPredict = !isFinished && !hasStarted;
 
   // Mostrar confetti si acertó exacto
   useEffect(() => {
@@ -101,62 +170,62 @@ export const MatchCard: React.FC<MatchCardProps> = ({ match }) => {
   return (
     <div
       id={`match-card-${match.matchId}`}
-      className={`glass-card-hover p-5 animate-slide-up transition-all duration-300 ${
+      className={`glass-card-hover p-2.5 animate-slide-up transition-all duration-300 ${
         isFinished ? 'opacity-80' : ''
       } ${pointsResult === 'exact' ? 'border-dorado-400/40' : ''}`}
     >
       {/* Header: Grupo + Status */}
-      <div className="flex items-center justify-between mb-4">
-        <span className="text-xs font-bold text-white/40 tracking-widest uppercase">
+      <div className="flex items-center justify-between mb-1.5">
+        <span className="text-[9px] font-bold text-white/40 tracking-wider uppercase">
           Grupo {match.group}
         </span>
         <StatusBadge status={match.status} />
       </div>
 
       {/* Equipos y marcadores */}
-      <div className="flex items-center justify-between gap-3 mb-5">
+      <div className="flex items-center justify-between gap-1.5 mb-2">
         {/* Local */}
-        <div className="flex-1 flex flex-col items-center gap-2">
-          <span className="text-4xl animate-float" style={{ animationDelay: '0s' }}>
+        <div className="flex-1 flex flex-col items-center gap-0.5">
+          <span className="animate-float" style={{ animationDelay: '0s' }}>
             {getFlag(match.homeTeam)}
           </span>
-          <span className="text-sm font-bold text-white text-center leading-tight">
+          <span className="text-[11px] font-bold text-white text-center leading-tight">
             {match.homeTeam}
           </span>
           {isFinished && (
-            <span className="text-2xl font-display font-black text-verde-400">
+            <span className="text-lg font-display font-black text-verde-400">
               {match.homeScore}
             </span>
           )}
         </div>
 
         {/* Centro */}
-        <div className="flex flex-col items-center gap-2 min-w-[80px]">
+        <div className="flex flex-col items-center gap-0.5 min-w-[70px]">
           {isFinished ? (
-            <span className="text-xs font-bold text-white/40">RESULTADO</span>
+            <span className="text-[8px] font-bold text-white/40">RESULTADO</span>
           ) : (
-            <span className="text-xs text-white/30 font-medium text-center">
+            <span className="text-[9px] text-white/30 font-medium text-center leading-none">
               {formatMatchDate(match.matchDate, match.matchTime)}
             </span>
           )}
-          <span className="text-white/20 font-display font-black text-xl">VS</span>
+          <span className="text-white/10 font-display font-black text-xs">VS</span>
           {isFinished && (
-            <span className="text-xs text-white/30 font-medium text-center">
+            <span className="text-[9px] text-white/30 font-medium text-center leading-none">
               {formatMatchDate(match.matchDate)}
             </span>
           )}
         </div>
 
         {/* Visitante */}
-        <div className="flex-1 flex flex-col items-center gap-2">
-          <span className="text-4xl animate-float" style={{ animationDelay: '0.5s' }}>
+        <div className="flex-1 flex flex-col items-center gap-0.5">
+          <span className="animate-float" style={{ animationDelay: '0.5s' }}>
             {getFlag(match.awayTeam)}
           </span>
-          <span className="text-sm font-bold text-white text-center leading-tight">
+          <span className="text-[11px] font-bold text-white text-center leading-tight">
             {match.awayTeam}
           </span>
           {isFinished && (
-            <span className="text-2xl font-display font-black text-verde-400">
+            <span className="text-lg font-display font-black text-verde-400">
               {match.awayScore}
             </span>
           )}
@@ -164,16 +233,16 @@ export const MatchCard: React.FC<MatchCardProps> = ({ match }) => {
       </div>
 
       {/* Separador */}
-      <div className="h-px bg-white/5 mb-4" />
+      <div className="h-px bg-white/5 mb-2.5" />
 
       {/* Predicción */}
-      <div className="space-y-3">
-        <p className="text-xs text-white/40 text-center font-semibold uppercase tracking-wider">
+      <div className="space-y-1.5">
+        <p className="text-[10px] text-white/40 text-center font-semibold uppercase tracking-wider">
           {isFinished ? 'Mi Predicción' : 'Tu Predicción'}
         </p>
 
         {/* Inputs de predicción */}
-        <div className="flex items-center justify-center gap-4">
+        <div className="flex items-center justify-center gap-3">
           <input
             id={`pred-home-${match.matchId}`}
             type="number"
@@ -187,7 +256,7 @@ export const MatchCard: React.FC<MatchCardProps> = ({ match }) => {
             aria-label={`Goles ${match.homeTeam}`}
           />
 
-          <span className="text-white/30 font-display font-black text-2xl">:</span>
+          <span className="text-white/30 font-display font-black text-xl">:</span>
 
           <input
             id={`pred-away-${match.matchId}`}
@@ -209,6 +278,16 @@ export const MatchCard: React.FC<MatchCardProps> = ({ match }) => {
             <PointsBadge points={prediction.points} result={pointsResult} large />
           ) : isFinished ? (
             <span className="text-xs text-white/30 italic">No predijiste este partido</span>
+          ) : !canPredict ? (
+            prediction ? (
+              <span className="text-xs text-white/50 font-semibold bg-white/5 border border-white/10 px-3 py-1.5 rounded-xl flex items-center gap-1.5">
+                🔒 Cerrado · Tu predicción: {prediction.homeScore} – {prediction.awayScore}
+              </span>
+            ) : (
+              <span className="text-xs text-red-400/85 font-semibold bg-red-500/5 border border-red-500/10 px-3 py-1.5 rounded-xl">
+                🔒 Cerrado · No predicho
+              </span>
+            )
           ) : saved ? (
             <span className="text-verde-400 text-sm font-bold flex items-center gap-1 animate-bounce-in">
               ✓ ¡Predicción guardada!
