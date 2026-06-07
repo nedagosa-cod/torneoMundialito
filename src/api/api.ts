@@ -1,5 +1,5 @@
 // ============================================================
-//  API CLIENT — Polla del Mundia (Supabase Version)
+//  API CLIENT — Polla del Mundial (Supabase Version)
 //  Todas las funciones de comunicación con Supabase
 // ============================================================
 
@@ -59,7 +59,7 @@ export async function apiGetMatches(): Promise<ApiResponse<Match[]>> {
       .select('*')
       .order('match_date', { ascending: true })
       .order('match_time', { ascending: true });
-    
+
     if (error) throw error;
     return { success: true, data: (data || []).map(mapMatch) };
   } catch (err: any) {
@@ -73,7 +73,7 @@ export async function apiGetLeaderboard(): Promise<ApiResponse<LeaderboardEntry[
       .from('users')
       .select('*')
       .order('total_points', { ascending: false });
-    
+
     if (error) throw error;
 
     const leaderboard: LeaderboardEntry[] = (data || []).map((u: any, index: number) => ({
@@ -94,12 +94,12 @@ export async function apiGetLeaderboard(): Promise<ApiResponse<LeaderboardEntry[
 export async function apiGetPredictions(userId: string): Promise<ApiResponse<Prediction[]>> {
   try {
     if (!userId) return { success: false, error: 'userId requerido' };
-    
+
     const { data, error } = await supabase
       .from('predictions')
       .select('*')
       .eq('user_id', userId);
-    
+
     if (error) throw error;
     return { success: true, data: (data || []).map(mapPrediction) };
   } catch (err: any) {
@@ -122,7 +122,7 @@ export async function apiGetSyncStatus(): Promise<ApiResponse<SyncStatus>> {
       .select('*')
       .order('timestamp', { ascending: false })
       .limit(1);
-    
+
     if (error) throw error;
     const last = data && data.length > 0 ? data[0] : null;
 
@@ -157,9 +157,9 @@ export async function apiAdminGetUsers(): Promise<ApiResponse<AdminUserEntry[]>>
       .from('users')
       .select('*')
       .order('first_name', { ascending: true });
-    
+
     if (error) throw error;
-    
+
     const users: AdminUserEntry[] = (data || []).map((u: any) => ({
       id: u.id,
       firstName: u.first_name,
@@ -169,7 +169,7 @@ export async function apiAdminGetUsers(): Promise<ApiResponse<AdminUserEntry[]>>
       totalPoints: u.total_points || 0,
       createdAt: u.created_at,
     }));
-    
+
     return { success: true, data: users };
   } catch (err: any) {
     return { success: false, error: err.message || 'Error al obtener usuarios' };
@@ -186,10 +186,10 @@ export async function apiSyncMatches(adminPassword: string): Promise<ApiResponse
   error?: string;
 }>> {
   try {
-    if (adminPassword !== 'mundia2026') {
+    if (adminPassword !== 'mundial2026') {
       return { success: false, error: 'Contraseña de admin incorrecta' };
     }
-    
+
     // Correr propagación de llaves por seguridad
     try {
       await autoPropagateTeamsSupabase();
@@ -385,7 +385,7 @@ export interface UpdateMatchParams {
 
 export async function apiUpdateMatch(params: UpdateMatchParams): Promise<ApiResponse<{ matchId: string }>> {
   try {
-    if (params.adminPassword !== 'mundia2026') {
+    if (params.adminPassword !== 'mundial2026') {
       return { success: false, error: 'Contraseña de administrador incorrecta' };
     }
 
@@ -455,7 +455,7 @@ export async function apiAddMatch(
   group: string,
 ): Promise<ApiResponse<Match>> {
   try {
-    if (adminPassword !== 'mundia2026') {
+    if (adminPassword !== 'mundial2026') {
       return { success: false, error: 'Contraseña incorrecta' };
     }
 
@@ -487,7 +487,7 @@ export async function apiAddMatch(
 /** Reiniciar las predicciones de un usuario */
 export async function apiResetUserPredictions(adminPassword: string, userId: string): Promise<ApiResponse<void>> {
   try {
-    if (adminPassword !== 'mundia2026') {
+    if (adminPassword !== 'mundial2026') {
       return { success: false, error: 'Contraseña de administrador incorrecta' };
     }
     if (!userId) {
@@ -602,7 +602,7 @@ function calculateGroupStandings(matches: DBMatch[], groupLetter: string): TeamS
 
 function calculateBestThirdPlacedTeams(matches: DBMatch[]): TeamStats[] {
   const thirds: TeamStats[] = [];
-  const groups = ['A','B','C','D','E','F','G','H','I','J','K','L'];
+  const groups = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L'];
   groups.forEach(g => {
     // Solo consideramos terceros lugares de grupos cuyos partidos estén 100% finalizados
     const groupMatches = matches.filter(
@@ -687,7 +687,7 @@ export async function autoPropagateTeamsSupabase(): Promise<void> {
   });
 
   const groupStandings: Record<string, TeamStats[]> = {};
-  const groups = ['A','B','C','D','E','F','G','H','I','J','K','L'];
+  const groups = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L'];
   groups.forEach(g => {
     groupStandings[g] = calculateGroupStandings(matches, g);
   });
@@ -754,7 +754,7 @@ export async function autoPropagateTeamsSupabase(): Promise<void> {
     const m = matchMap[matchId];
     if (m && !m.match_type.includes('_locked')) {
       if (homeTeam) m.home_team = homeTeam;
-      
+
       const assignedThird = thirdPlaceAssignments[matchId];
       m.away_team = assignedThird || 'Por definir';
     }

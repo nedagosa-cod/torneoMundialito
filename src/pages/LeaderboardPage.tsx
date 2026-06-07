@@ -24,17 +24,18 @@ export const LeaderboardPage: React.FC = () => {
       <div
         className="sticky top-0 z-40 px-4 pt-6 pb-4"
         style={{
-          background: 'linear-gradient(to bottom, rgba(2,12,6,0.97) 0%, rgba(2,12,6,0.8) 100%)',
+          background: 'linear-gradient(to bottom, rgba(5,8,20,0.96) 0%, rgba(5,8,20,0.85) 100%)',
           backdropFilter: 'blur(20px)',
+          borderBottom: '1px solid rgba(255,255,255,0.06)',
         }}
       >
         <div className="max-w-lg mx-auto">
           <div className="flex items-center justify-between mb-2">
             <div>
-              <h1 className="font-display font-black text-2xl text-white">
-                🏆 Ranking
+              <h1 className="font-display font-black text-2xl text-white tracking-wide">
+                🏆 Clasificación
               </h1>
-              <p className="text-white/30 text-xs mt-0.5">
+              <p className="text-white/45 text-[11px] font-semibold mt-0.5 uppercase tracking-wider">
                 {lastUpdated
                   ? `Actualizado ${lastUpdated.toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' })}`
                   : 'Cargando...'}
@@ -44,9 +45,9 @@ export const LeaderboardPage: React.FC = () => {
               id="refresh-leaderboard-btn"
               onClick={handleLoad}
               disabled={refreshing}
-              className="px-4 py-2 rounded-xl text-xs font-bold text-verde-400 bg-verde-400/10 hover:bg-verde-400/20 transition-all duration-200 border border-verde-400/20"
+              className="px-4 py-2 rounded-full text-xs font-black uppercase tracking-wider text-verde-400 bg-verde-500/10 hover:bg-verde-500/20 active:scale-95 transition-all duration-200 border border-verde-400/20"
             >
-              {refreshing ? '⟳ ...' : '↺ Actualizar'}
+              {refreshing ? '⟳ Cargando' : '↺ Refrescar'}
             </button>
           </div>
         </div>
@@ -54,82 +55,100 @@ export const LeaderboardPage: React.FC = () => {
 
       {/* Podio Top 3 */}
       {leaderboard.length >= 3 && (
-        <div className="px-4 max-w-lg mx-auto mb-6">
-          <div className="flex items-end justify-center gap-3 pt-4">
+        <div className="px-4 max-w-lg mx-auto mb-8">
+          <div className="flex items-end justify-center gap-3 pt-6 relative">
             {/* 2do lugar */}
-            <div className="flex flex-col items-center gap-2 flex-1">
+            <div className="flex flex-col items-center gap-2.5 flex-1 z-10">
               <div
-                className="w-14 h-14 rounded-full flex items-center justify-center text-2xl font-display font-black border-2"
-                style={{ borderColor: '#94a3b8', background: 'rgba(148,163,184,0.1)' }}
+                className="w-14 h-14 rounded-full flex items-center justify-center text-xl font-display font-black border-3 bg-pitch-900 text-slate-200 transition-all duration-300"
+                style={{ borderColor: '#cbd5e1', boxShadow: '0 4px 15px rgba(203,213,225,0.2)' }}
               >
                 {leaderboard[1]?.firstName?.[0]?.toUpperCase() || leaderboard[1]?.username[0]?.toUpperCase()}
               </div>
-              <p className="text-xs font-bold text-white/70 truncate w-full text-center">
-                {leaderboard[1]?.firstName || leaderboard[1]?.username}
-              </p>
-              <p className="text-sm font-display font-black" style={{ color: '#94a3b8' }}>
-                {leaderboard[1]?.totalPoints} pts
-              </p>
+              <div className="text-center w-full min-w-0">
+                <p className="text-xs font-extrabold text-white truncate px-1">
+                  {leaderboard[1]?.firstName || leaderboard[1]?.username}
+                </p>
+                <p className="text-[11px] font-display font-bold text-slate-400 mt-0.5">
+                  {leaderboard[1]?.totalPoints} pts
+                </p>
+              </div>
               <div
-                className="w-full rounded-t-xl flex items-center justify-center py-3 text-2xl font-display font-black"
-                style={{ height: '70px', background: 'rgba(148,163,184,0.1)', border: '1px solid rgba(148,163,184,0.2)' }}
+                className="w-full rounded-t-2xl flex flex-col items-center justify-start pt-3 text-lg font-display font-black text-slate-300 border-t border-x"
+                style={{
+                  height: '80px',
+                  borderColor: 'rgba(203,213,225,0.3)',
+                  background: 'linear-gradient(to bottom, rgba(203,213,225,0.15), rgba(203,213,225,0.02))',
+                }}
               >
-                🥈
+                <span>🥈</span>
+                <span className="text-[10px] font-extrabold tracking-widest text-slate-400/80 mt-1">2ND</span>
               </div>
             </div>
 
             {/* 1er lugar */}
-            <div className="flex flex-col items-center gap-2 flex-1 -mb-1">
-              <div className="animate-pulse-gold w-5 h-5 rounded-full flex items-center justify-center text-xs">
+            <div className="flex flex-col items-center gap-2.5 flex-1 -mb-1 z-20 relative">
+              {/* Corona flotante */}
+              <div className="animate-bounce absolute -top-7 text-xl drop-shadow-md select-none">
                 👑
               </div>
               <div
-                className="w-16 h-16 rounded-full flex items-center justify-center text-2xl font-display font-black border-2"
+                className="w-16 h-16 rounded-full flex items-center justify-center text-2xl font-display font-black border-4 bg-pitch-900 text-dorado-300 transition-all duration-300"
                 style={{
-                  borderColor: '#fbbf24',
-                  background: 'rgba(251,191,36,0.15)',
-                  boxShadow: '0 0 20px rgba(251,191,36,0.4)',
+                  borderColor: '#ffd700',
+                  boxShadow: '0 8px 25px rgba(255,215,0,0.35)',
                 }}
               >
                 {leaderboard[0]?.firstName?.[0]?.toUpperCase() || leaderboard[0]?.username[0]?.toUpperCase()}
               </div>
-              <p className="text-sm font-bold text-dorado-400 truncate w-full text-center">
-                {leaderboard[0]?.firstName || leaderboard[0]?.username}
-              </p>
-              <p className="text-base font-display font-black text-dorado-400">
-                {leaderboard[0]?.totalPoints} pts
-              </p>
+              <div className="text-center w-full min-w-0">
+                <p className="text-sm font-black text-dorado-300 truncate px-1">
+                  {leaderboard[0]?.firstName || leaderboard[0]?.username}
+                </p>
+                <p className="text-xs font-display font-black text-dorado-400 mt-0.5">
+                  {leaderboard[0]?.totalPoints} pts
+                </p>
+              </div>
               <div
-                className="w-full rounded-t-xl flex items-center justify-center py-3 text-2xl font-display font-black"
+                className="w-full rounded-t-2xl flex flex-col items-center justify-start pt-4 text-2xl font-display font-black border-t border-x relative overflow-hidden"
                 style={{
-                  height: '95px',
-                  background: 'linear-gradient(to bottom, rgba(251,191,36,0.15), rgba(251,191,36,0.05))',
-                  border: '1px solid rgba(251,191,36,0.3)',
+                  height: '115px',
+                  borderColor: 'rgba(255,215,0,0.4)',
+                  background: 'linear-gradient(to bottom, rgba(255,215,0,0.2), rgba(255,215,0,0.03))',
+                  boxShadow: '0 -4px 25px rgba(255,215,0,0.1)',
                 }}
               >
-                🥇
+                <span>🥇</span>
+                <span className="text-xs font-black tracking-widest text-dorado-400/80 mt-1.5">LEADER</span>
               </div>
             </div>
 
             {/* 3er lugar */}
-            <div className="flex flex-col items-center gap-2 flex-1">
+            <div className="flex flex-col items-center gap-2.5 flex-1 z-10">
               <div
-                className="w-14 h-14 rounded-full flex items-center justify-center text-2xl font-display font-black border-2"
-                style={{ borderColor: '#cd7f32', background: 'rgba(205,127,50,0.1)' }}
+                className="w-14 h-14 rounded-full flex items-center justify-center text-xl font-display font-black border-3 bg-pitch-900 text-amber-600 transition-all duration-300"
+                style={{ borderColor: '#b45309', boxShadow: '0 4px 15px rgba(180,83,9,0.2)' }}
               >
                 {leaderboard[2]?.firstName?.[0]?.toUpperCase() || leaderboard[2]?.username[0]?.toUpperCase()}
               </div>
-              <p className="text-xs font-bold text-white/70 truncate w-full text-center">
-                {leaderboard[2]?.firstName || leaderboard[2]?.username}
-              </p>
-              <p className="text-sm font-display font-black" style={{ color: '#cd7f32' }}>
-                {leaderboard[2]?.totalPoints} pts
-              </p>
+              <div className="text-center w-full min-w-0">
+                <p className="text-xs font-extrabold text-white truncate px-1">
+                  {leaderboard[2]?.firstName || leaderboard[2]?.username}
+                </p>
+                <p className="text-[11px] font-display font-bold text-amber-500 mt-0.5">
+                  {leaderboard[2]?.totalPoints} pts
+                </p>
+              </div>
               <div
-                className="w-full rounded-t-xl flex items-center justify-center py-3 text-2xl font-display font-black"
-                style={{ height: '55px', background: 'rgba(205,127,50,0.1)', border: '1px solid rgba(205,127,50,0.2)' }}
+                className="w-full rounded-t-2xl flex flex-col items-center justify-start pt-3 text-lg font-display font-black text-amber-600 border-t border-x"
+                style={{
+                  height: '60px',
+                  borderColor: 'rgba(180,83,9,0.3)',
+                  background: 'linear-gradient(to bottom, rgba(180,83,9,0.15), rgba(180,83,9,0.02))',
+                }}
               >
-                🥉
+                <span>🥉</span>
+                <span className="text-[10px] font-extrabold tracking-widest text-amber-600/80 mt-1">3RD</span>
               </div>
             </div>
           </div>

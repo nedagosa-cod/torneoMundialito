@@ -1,5 +1,5 @@
 // ============================================================
-//  ZUSTAND GLOBAL STORE — Polla del Mundia
+//  ZUSTAND GLOBAL STORE — Polla del Mundial
 // ============================================================
 
 import { create } from 'zustand';
@@ -120,7 +120,7 @@ export const useStore = create<AppState>()(
       loadPredictions: async () => {
         const { user } = get();
         if (!user) return;
-        
+
         // 1. Cargar predicciones del usuario
         const res = await apiGetPredictions(user.userId);
         if (res.success && res.data) set({ predictions: res.data });
@@ -192,7 +192,7 @@ export const useStore = create<AppState>()(
       clearError: () => set({ error: null }),
     }),
     {
-      name: 'polla-mundia-store',
+      name: 'polla-Mundial-store',
       partialize: (state) => ({ user: state.user, drafts: state.drafts }),
     },
   ),

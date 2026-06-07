@@ -36,18 +36,22 @@ const LeaderboardRow: React.FC<LeaderboardRowProps> = ({ entry, isCurrentUser, a
   return (
     <div
       id={`leaderboard-row-${entry.userId}`}
-      className={`flex items-center gap-4 p-4 rounded-2xl transition-all duration-300 animate-slide-up
+      className={`flex items-center gap-4 p-4 rounded-2xl transition-all duration-300 animate-slide-up border
         ${isCurrentUser
-          ? 'border border-verde-400/40 bg-verde-400/5'
-          : isTop3
-          ? 'border border-white/10 glass-card'
-          : 'border border-transparent hover:border-white/10 hover:bg-white/3'
+          ? 'border-verde-400/30 bg-verde-500/10 shadow-glow-verde'
+          : entry.position === 1
+          ? 'border-dorado-400/25 bg-dorado-500/5'
+          : entry.position === 2
+          ? 'border-slate-400/20 bg-slate-400/5'
+          : entry.position === 3
+          ? 'border-amber-700/20 bg-amber-700/5'
+          : 'border-white/5 bg-pitch-900/40 hover:border-white/10 hover:bg-pitch-900/70'
         }`}
       style={{ animationDelay: `${animDelay}ms` }}
     >
       {/* Posición */}
       <div
-        className={`w-10 h-10 rounded-full flex items-center justify-center text-sm font-display font-black flex-shrink-0 ${rank.class}`}
+        className={`w-10 h-10 rounded-full flex items-center justify-center text-sm font-display font-black flex-shrink-0 shadow-sm ${rank.class}`}
       >
         {isTop3 ? rank.emoji : entry.position}
       </div>
@@ -55,26 +59,26 @@ const LeaderboardRow: React.FC<LeaderboardRowProps> = ({ entry, isCurrentUser, a
       {/* Nombre */}
       <div className="flex-1 min-w-0">
         <div className="flex items-center gap-2">
-          <p className={`font-bold truncate ${isCurrentUser ? 'text-verde-400' : 'text-white'}`}>
+          <p className={`font-bold truncate text-sm ${isCurrentUser ? 'text-verde-400' : 'text-white'}`}>
             {entry.firstName || entry.username}
           </p>
           {isCurrentUser && (
-            <span className="text-xs bg-verde-400/20 text-verde-400 px-2 py-0.5 rounded-full font-semibold flex-shrink-0">
+            <span className="text-[9px] bg-verde-500/20 text-verde-400 px-2 py-0.5 rounded-full font-black uppercase tracking-wide flex-shrink-0">
               Tú
             </span>
           )}
         </div>
         {isTop3 && (
-          <p className="text-xs text-white/40 mt-0.5">{rank.label}</p>
+          <p className="text-[10px] text-white/40 font-semibold uppercase tracking-wider mt-0.5">{rank.label}</p>
         )}
       </div>
 
       {/* Puntos */}
       <div className="flex flex-col items-end flex-shrink-0">
         <span
-          className={`text-xl font-display font-black ${
+          className={`text-lg font-display font-black ${
             entry.position === 1
-              ? 'text-dorado-400'
+              ? 'text-dorado-300'
               : isCurrentUser
               ? 'text-verde-400'
               : 'text-white'
@@ -82,8 +86,8 @@ const LeaderboardRow: React.FC<LeaderboardRowProps> = ({ entry, isCurrentUser, a
         >
           {entry.totalPoints}
         </span>
-        <span className="text-xs text-white/30 font-medium">
-          {entry.totalPoints === 1 ? 'punto' : 'puntos'}
+        <span className="text-[10px] text-white/30 font-semibold uppercase tracking-wide">
+          {entry.totalPoints === 1 ? 'pt' : 'pts'}
         </span>
       </div>
     </div>
@@ -99,15 +103,18 @@ export const LeaderboardComponent: React.FC = () => {
       {/* Stats del usuario actual */}
       {myEntry && (
         <div
-          className="glass-card p-5 mb-6 text-center"
-          style={{ background: 'linear-gradient(135deg, rgba(34,197,94,0.1), rgba(34,197,94,0.03))' }}
+          className="glass-card p-4 mb-6 text-center border-t-2 border-t-verde-400 relative overflow-hidden"
+          style={{ background: 'linear-gradient(135deg, rgba(0,255,135,0.08) 0%, rgba(0,255,135,0.01) 100%)' }}
         >
-          <p className="text-sm text-white/50 mb-1">Tu posición actual</p>
-          <p className="text-5xl font-display font-black text-verde-400">
-            #{myEntry.position}
-          </p>
-          <p className="text-sm text-white/40 mt-1">
-            con <span className="text-white font-bold">{myEntry.totalPoints} puntos</span>
+          <p className="text-[10px] font-bold text-white/40 uppercase tracking-widest mb-1">Tu posición actual</p>
+          <div className="flex items-center justify-center gap-1.5">
+            <span className="text-3xl font-display font-black text-transparent bg-clip-text bg-gradient-to-r from-verde-400 to-verde-500">
+              #{myEntry.position}
+            </span>
+            <span className="text-xl">⚡</span>
+          </div>
+          <p className="text-xs text-white/60 mt-1 font-medium">
+            Tienes <span className="text-white font-black">{myEntry.totalPoints} puntos</span> en total
           </p>
         </div>
       )}

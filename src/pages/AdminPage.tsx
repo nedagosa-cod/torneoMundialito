@@ -92,7 +92,7 @@ function SyncPanel({ adminPassword }: { adminPassword: string }) {
 
   const statusColor = status?.lastStatus === 'success'
     ? 'text-verde-400' : status?.lastStatus === 'error'
-    ? 'text-red-400' : 'text-white/40';
+      ? 'text-red-400' : 'text-white/40';
 
   const statusIcon = status?.lastStatus === 'success' ? '✅' :
     status?.lastStatus === 'error' ? '⚠️' : '—';
@@ -124,7 +124,7 @@ function SyncPanel({ adminPassword }: { adminPassword: string }) {
                   <span className={statusColor}>
                     {status?.lastStatus === 'success' ? 'Último recálculo exitoso'
                       : status?.lastStatus === 'error' ? 'El recálculo falló'
-                      : 'Sin recálculos de puntos aún'}
+                        : 'Sin recálculos de puntos aún'}
                   </span>
                 </p>
                 <p className="text-xs text-white/30">
@@ -146,20 +146,12 @@ function SyncPanel({ adminPassword }: { adminPassword: string }) {
           <div className="flex-shrink-0 text-right">
             <div className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-xl bg-verde-400/10 border border-verde-400/20">
               <span className="w-1.5 h-1.5 rounded-full bg-verde-400 inline-block" />
-              <span className="text-xs font-bold text-verde-400">En tiempo real / Supabase</span>
+              <span className="text-xs font-bold text-verde-400">Actualizada</span>
             </div>
           </div>
         </div>
       </div>
 
-      {/* Info sobre el auto-sync */}
-      <div className="px-3 py-2.5 rounded-xl bg-white/3 border border-white/5">
-        <p className="text-xs text-white/40 leading-relaxed">
-          🔗 Fuente de Datos: <span className="text-verde-400/70 font-mono text-xs">Supabase (PostgreSQL)</span>
-          <br />
-          Toda la información se lee y escribe directamente en Supabase. Al guardar cambios de marcador, los puntos de las predicciones y de la tabla general se calculan instantáneamente en la base de datos.
-        </p>
-      </div>
 
       {/* Botón de sync manual */}
       <button
@@ -184,18 +176,17 @@ function SyncPanel({ adminPassword }: { adminPassword: string }) {
             Recalculando posiciones...
           </span>
         ) : (
-          '🏆 Forzar Recálculo de Puntos (Supabase)'
+          '🏆 Forzar Recálculo de Puntos'
         )}
       </button>
 
       {/* Resultado */}
       {lastResult && (
         <div
-          className={`px-4 py-3 rounded-xl border animate-slide-up ${
-            lastResult.ok
-              ? 'bg-verde-400/5 border-verde-400/20'
-              : 'bg-red-500/5 border-red-500/20'
-          }`}
+          className={`px-4 py-3 rounded-xl border animate-slide-up ${lastResult.ok
+            ? 'bg-verde-400/5 border-verde-400/20'
+            : 'bg-red-500/5 border-red-500/20'
+            }`}
         >
           <p className={`text-sm font-bold ${lastResult.ok ? 'text-verde-400' : 'text-red-400'}`}>
             {lastResult.msg}
@@ -206,22 +197,7 @@ function SyncPanel({ adminPassword }: { adminPassword: string }) {
         </div>
       )}
 
-      {/* Instrucción del trigger GAS */}
-      <div className="px-3 py-3 rounded-xl space-y-3" style={{ background: 'rgba(251,191,36,0.05)', border: '1px solid rgba(251,191,36,0.15)' }}>
-        <div>
-          <p className="text-dorado-400 text-xs font-bold mb-1">📝 Gestión de Resultados</p>
-          <p className="text-white/35 text-xs leading-relaxed">
-            Ve a la pestaña <strong>Resultados</strong> para actualizar marcadores. Al guardar, los puntos y posiciones de los usuarios se recalculan automáticamente en Supabase en menos de 0.1 segundos.
-          </p>
-        </div>
-        
-        <div className="pt-2 border-t border-white/5">
-          <p className="text-dorado-400 text-xs font-bold mb-1">⚡ Carga Inicial Fixture</p>
-          <p className="text-white/35 text-xs leading-relaxed">
-            El fixture oficial de 104 partidos en español y con horario de Colombia ya se encuentra migrado en la base de datos de Supabase y listo para usarse.
-          </p>
-        </div>
-      </div>
+
     </div>
   );
 }
@@ -401,7 +377,7 @@ function UpdateMatchForm({ match, adminPassword }: { match: Match; adminPassword
             onChange={(e) => setAwayScore(e.target.value)}
           />
         </div>
-        
+
         {/* Dropdown de Estado */}
         <div className="flex-1.5 min-w-[90px]">
           <label className="block text-[10px] text-white/40 mb-0.5 font-semibold">Estado</label>
@@ -440,7 +416,7 @@ function UpdateMatchForm({ match, adminPassword }: { match: Match; adminPassword
             </button>
           )}
         </div>
-        
+
         <Button
           variant="gold"
           size="sm"
@@ -517,7 +493,7 @@ function AddMatchForm({ adminPassword }: { adminPassword: string }) {
           <label className="block text-xs text-white/40 mb-1 font-semibold">Etapa</label>
           <select id="add-match-group" className="input-field text-sm"
             value={form.group} onChange={(e) => update('group', e.target.value)}>
-            {['A','B','C','D','E','F','G','H','I','J','K','L','R32','R16','QF','SF','3RD','FINAL'].map(
+            {['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'R32', 'R16', 'QF', 'SF', '3RD', 'FINAL'].map(
               (g) => <option key={g} value={g}>{g}</option>
             )}
           </select>
@@ -594,7 +570,7 @@ function UsersPanel({ adminPassword }: { adminPassword: string }) {
   // Pagination calculations
   const ITEMS_PER_PAGE = 20;
   const totalPages = Math.max(1, Math.ceil(filteredUsers.length / ITEMS_PER_PAGE));
-  
+
   // Reset to page 1 if current page is out of bounds due to filtering
   useEffect(() => {
     if (currentPage > totalPages) {
@@ -627,7 +603,7 @@ function UsersPanel({ adminPassword }: { adminPassword: string }) {
             </button>
           )}
         </div>
-        
+
         <div className="flex items-center gap-2 px-3 py-2.5 rounded-xl bg-white/3 border border-white/5 justify-between">
           <span className="text-xs text-white/40">Total:</span>
           <span className="text-sm font-display font-black text-dorado-400">
@@ -780,12 +756,12 @@ export const AdminPage: React.FC = () => {
     e.preventDefault();
     const trimmed = password.trim();
     if (!trimmed) { setPasswordError('Ingresa la contraseña'); return; }
-    
-    if (trimmed !== 'mundia2026') {
+
+    if (trimmed !== 'mundial2026') {
       setPasswordError('Contraseña incorrecta');
       return;
     }
-    
+
     setAdminPassword(trimmed);
     sessionStorage.setItem(ADMIN_STORAGE_KEY, 'true');
     sessionStorage.setItem(ADMIN_PASSWORD_KEY, trimmed);
@@ -844,15 +820,15 @@ export const AdminPage: React.FC = () => {
     return m.group === selectedGroupFilter && (m.matchType === 'group' || m.matchType?.startsWith('group') || !m.matchType);
   });
 
-  const liveMatches      = filteredMatches.filter((m) => m.status === 'live');
-  const upcomingMatches  = filteredMatches.filter((m) => m.status === 'upcoming');
-  const finishedMatches  = filteredMatches.filter((m) => m.status === 'finished');
+  const liveMatches = filteredMatches.filter((m) => m.status === 'live');
+  const upcomingMatches = filteredMatches.filter((m) => m.status === 'upcoming');
+  const finishedMatches = filteredMatches.filter((m) => m.status === 'finished');
 
   const sections = [
-    { id: 'sync' as const,   label: '🔄 API Sync',  badge: null },
+    { id: 'sync' as const, label: '🔄 API Sync', badge: null },
     { id: 'update' as const, label: '📝 Resultados', badge: liveMatches.length + upcomingMatches.length || null },
-    { id: 'add' as const,    label: '➕ Agregar',    badge: null },
-    { id: 'users' as const,  label: '👥 Usuarios',   badge: null },
+    { id: 'add' as const, label: '➕ Agregar', badge: null },
+    { id: 'users' as const, label: '👥 Usuarios', badge: null },
   ];
 
   return (
@@ -877,13 +853,12 @@ export const AdminPage: React.FC = () => {
             {sections.map((s) => (
               <button key={s.id} id={`admin-tab-${s.id}`}
                 onClick={() => setActiveSection(s.id)}
-                className={`flex-1 py-2 px-3 rounded-xl text-xs font-bold transition-all duration-200 relative ${
-                  activeSection === s.id
-                    ? s.id === 'sync'
-                      ? 'bg-verde-400/20 text-verde-400 border border-verde-400/30'
-                      : 'bg-dorado-400/20 text-dorado-400 border border-dorado-400/30'
-                    : 'text-white/40 hover:text-white/70 hover:bg-white/5'
-                }`}
+                className={`flex-1 py-2 px-3 rounded-xl text-xs font-bold transition-all duration-200 relative ${activeSection === s.id
+                  ? s.id === 'sync'
+                    ? 'bg-verde-400/20 text-verde-400 border border-verde-400/30'
+                    : 'bg-dorado-400/20 text-dorado-400 border border-dorado-400/30'
+                  : 'text-white/40 hover:text-white/70 hover:bg-white/5'
+                  }`}
               >
                 {s.label}
                 {s.badge !== null && s.badge > 0 && (
@@ -924,11 +899,10 @@ export const AdminPage: React.FC = () => {
                       <button
                         key={filterVal}
                         onClick={() => setSelectedGroupFilter(filterVal)}
-                        className={`flex-shrink-0 px-3.5 py-1.5 rounded-full text-xs font-bold border transition-all duration-200 ${
-                          isActive
-                            ? 'bg-dorado-500/20 text-dorado-400 border-dorado-500/40 font-black'
-                            : 'bg-white/3 text-white/40 border-white/5 hover:text-white/70 hover:bg-white/5'
-                        }`}
+                        className={`flex-shrink-0 px-3.5 py-1.5 rounded-full text-xs font-bold border transition-all duration-200 ${isActive
+                          ? 'bg-dorado-500/20 text-dorado-400 border-dorado-500/40 font-black'
+                          : 'bg-white/3 text-white/40 border-white/5 hover:text-white/70 hover:bg-white/5'
+                          }`}
                       >
                         {label}
                       </button>

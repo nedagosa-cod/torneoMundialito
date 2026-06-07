@@ -1,5 +1,5 @@
 // ============================================================
-//  POLLA DEL MUNDIA — Google Apps Script Backend (Supabase Edition)
+//  POLLA DEL Mundial — Google Apps Script Backend (Supabase Edition)
 //  Su único propósito es sincronizar las respuestas de Google Forms
 //  hacia Supabase en tiempo real y migrar datos iniciales.
 // ============================================================

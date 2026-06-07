@@ -45,7 +45,17 @@ const ROUNDS_LIST = [
 ];
 
 export const DashboardPage: React.FC = () => {
-  const { user, matches, predictions, loadMatches, loadPredictions, isLoading, logout } = useStore();
+  const {
+    user,
+    matches,
+    predictions,
+    loadMatches,
+    loadPredictions,
+    isLoading,
+    logout,
+    leaderboard,
+    loadLeaderboard,
+  } = useStore();
   const [viewMode, setViewMode] = useState<ViewMode>('groups');
   const [activeGroup, setActiveGroup] = useState<string>('A');
   const [activeRound, setActiveRound] = useState<string>('r32');
@@ -60,11 +70,14 @@ export const DashboardPage: React.FC = () => {
     if (predictions.length === 0) {
       loadPredictions();
     }
+    if (leaderboard.length === 0) {
+      loadLeaderboard();
+    }
   }, []);
 
   const handleRefresh = async () => {
     setRefreshing(true);
-    await Promise.all([loadMatches(), loadPredictions()]);
+    await Promise.all([loadMatches(), loadPredictions(), loadLeaderboard()]);
     setRefreshing(false);
   };
 
@@ -93,6 +106,10 @@ export const DashboardPage: React.FC = () => {
     const hasPrediction = predictions.some((p) => p.matchId === m.matchId);
     return m.status === 'upcoming' && !hasPrediction;
   }).length;
+
+  // Encontrar el puesto en el leaderboard para el FUT Player Card
+  const myEntry = user ? leaderboard.find((e) => e.userId === user.userId) : null;
+  const myRank = myEntry ? myEntry.position : null;
 
   // Filter matches based on active tab and sub-filters
   const filteredMatches = matches.filter((m) => {
@@ -126,43 +143,27 @@ export const DashboardPage: React.FC = () => {
       <div
         className="sticky top-0 z-40 px-4 pt-4 pb-3"
         style={{
-          background: 'linear-gradient(to bottom, rgba(2,12,6,0.97) 0%, rgba(2,12,6,0.8) 100%)',
+          background: 'linear-gradient(to bottom, rgba(5,8,20,0.96) 0%, rgba(5,8,20,0.85) 100%)',
           backdropFilter: 'blur(20px)',
+          borderBottom: '1px solid rgba(255,255,255,0.06)',
         }}
       >
         <div className="max-w-lg mx-auto">
-          {/* Top row */}
-          <div className="flex items-center justify-between mb-3">
-            <div>
-              <p className="text-white/40 text-[10px] font-medium uppercase tracking-wider">Mundial 2026</p>
-              <h1 className="font-display font-black text-lg text-white leading-tight">
-                {user?.firstName || user?.username} 👋
-              </h1>
+          {/* Top Row: Brand & Actions */}
+          <div className="flex items-center justify-between mb-3.5">
+            <div className="flex items-center gap-1.5">
+              <span className="text-xl">🏆</span>
+              <span className="font-display font-black text-xs text-transparent bg-clip-text bg-gradient-to-r from-dorado-300 to-verde-400 uppercase tracking-widest">
+                Polla del Mundial
+              </span>
             </div>
 
-            <div className="flex items-center gap-2.5">
-              {/* Puntos totales */}
-              <div
-                className="flex items-center gap-2 px-3 py-1.5 rounded-xl"
-                style={{
-                  background: 'linear-gradient(135deg, rgba(251,191,36,0.15), rgba(251,191,36,0.05))',
-                  border: '1px solid rgba(251,191,36,0.3)',
-                }}
-              >
-                <span className="text-dorado-400 text-sm">⭐</span>
-                <div>
-                  <p className="text-dorado-400 font-display font-black text-sm leading-none">
-                    {user?.totalPoints ?? 0}
-                  </p>
-                  <p className="text-dorado-400/50 text-[10px] leading-none">pts</p>
-                </div>
-              </div>
-
+            <div className="flex items-center gap-2">
               {/* Botón refrescar */}
               <button
                 onClick={handleRefresh}
                 disabled={refreshing}
-                className="w-8 h-8 rounded-xl flex items-center justify-center text-white/30 hover:text-white/60 hover:bg-white/10 transition-all duration-200"
+                className="w-8 h-8 rounded-full flex items-center justify-center bg-white/5 border border-white/10 text-white/40 hover:text-white hover:bg-white/10 active:scale-90 transition-all duration-200"
                 title="Refrescar"
               >
                 <svg
@@ -173,7 +174,7 @@ export const DashboardPage: React.FC = () => {
                   <path
                     d="M4 12a8 8 0 018-8 8 8 0 017.7 5.9M20 12a8 8 0 01-8 8 8 8 0 01-7.7-5.9"
                     stroke="currentColor"
-                    strokeWidth="2"
+                    strokeWidth="2.5"
                     strokeLinecap="round"
                   />
                 </svg>
@@ -183,45 +184,87 @@ export const DashboardPage: React.FC = () => {
               <button
                 id="logout-btn"
                 onClick={logout}
-                className="w-8 h-8 rounded-xl flex items-center justify-center text-white/30 hover:text-white/60 hover:bg-white/10 transition-all duration-200"
+                className="w-8 h-8 rounded-full flex items-center justify-center bg-white/5 border border-white/10 text-white/40 hover:text-red-400 hover:bg-red-500/10 active:scale-90 transition-all duration-200"
                 title="Salir"
               >
-                <svg viewBox="0 0 24 24" fill="none" className="w-4.5 h-4.5">
+                <svg viewBox="0 0 24 24" fill="none" className="w-4 h-4">
                   <path
                     d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4M16 17l5-5-5-5M21 12H9"
-                    stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"
+                    stroke="currentColor"
+                    strokeWidth="2.5"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
                   />
                 </svg>
               </button>
             </div>
           </div>
 
+          {/* FUT-style Player statistics card */}
+          <div className="player-card-glow rounded-2xl bg-gradient-to-r from-pitch-800 to-pitch-700/80 p-3.5 border border-white/10 flex items-center justify-between mb-4 shadow-xl">
+            <div className="flex items-center gap-3">
+              {/* Avatar / Iniciales */}
+              <div className="relative">
+                <div className="w-12 h-12 rounded-full bg-gradient-gold p-0.5 flex items-center justify-center shadow-lg">
+                  <div className="w-full h-full rounded-full bg-pitch-900 flex items-center justify-center text-sm font-display font-black text-dorado-300">
+                    {(user?.firstName?.[0] || user?.username?.[0] || '⚽').toUpperCase()}
+                  </div>
+                </div>
+                <div className="absolute -bottom-1 -right-1 w-5 h-5 rounded-full bg-verde-500 border-2 border-pitch-900 flex items-center justify-center text-[10px] shadow-sm">
+                  👑
+                </div>
+              </div>
+
+              <div>
+                <p className="text-white/40 text-[9px] font-bold uppercase tracking-wider">Jugador Oficial</p>
+                <h2 className="text-sm font-black text-white leading-none mt-0.5">
+                  {user?.firstName || user?.username} {user?.lastName || ''}
+                </h2>
+                <p className="text-white/50 text-[10px] mt-1 font-medium">
+                  {myRank ? (
+                    <span>Clasificación: <strong className="text-verde-400 font-extrabold">#{myRank}</strong> en la general</span>
+                  ) : (
+                    <span>Calculando posición...</span>
+                  )}
+                </p>
+              </div>
+            </div>
+
+            {/* Puntos acumulados */}
+            <div className="flex flex-col items-end bg-black/35 border border-white/5 rounded-xl px-3 py-1.5 min-w-[75px] shadow-inner">
+              <span className="text-[9px] font-bold text-dorado-400 uppercase tracking-widest leading-none">Puntos</span>
+              <span className="text-lg font-display font-black text-dorado-300 leading-none mt-1">
+                {user?.totalPoints ?? 0}
+              </span>
+              <span className="text-[8px] text-white/30 font-semibold leading-none mt-0.5">pts total</span>
+            </div>
+          </div>
+
           {/* Alerta de predicciones pendientes */}
           {pendingCount > 0 && (
             <div
-              className="flex items-center justify-center gap-1.5 px-3 py-1.5 rounded-xl mb-3 animate-fade-in"
+              className="flex items-center justify-center gap-1.5 px-3 py-2 rounded-xl mb-3.5 animate-fade-in"
               style={{
                 background: 'rgba(251,191,36,0.08)',
-                border: '1px solid rgba(251,191,36,0.2)',
+                border: '1px solid rgba(251,191,36,0.25)',
               }}
             >
               <span className="text-dorado-400 text-xs">⚠️</span>
-              <p className="text-dorado-400 text-[11px] font-bold">
+              <p className="text-dorado-400 text-[11px] font-extrabold uppercase tracking-wide">
                 Tienes {pendingCount} prediccion{pendingCount !== 1 ? 'es' : 'ón'} pendiente{pendingCount !== 1 ? 's' : ''}
               </p>
             </div>
           )}
 
           {/* Selector de Vista Principal (Segmented Control) */}
-          <div className="flex bg-white/5 p-1 rounded-xl border border-white/10 mb-3">
+          <div className="flex bg-pitch-800/90 p-1 rounded-2xl border border-white/10 mb-3.5 shadow-inner">
             <button
               onClick={() => {
                 setViewMode('groups');
                 setFilter('all'); // Reset filter when switching main modes
               }}
-              className={`flex-1 py-1.5 text-[11px] font-bold rounded-lg transition-all duration-200 text-center ${
-                viewMode === 'groups' ? 'bg-white/10 text-white shadow-sm' : 'text-white/40 hover:text-white/60'
-              }`}
+              className={`flex-1 py-2 text-xs font-black rounded-xl transition-all duration-200 text-center font-display ${viewMode === 'groups' ? 'bg-white/10 text-white shadow-md' : 'text-white/40 hover:text-white/70'
+                }`}
             >
               🏆 Grupos
             </button>
@@ -230,9 +273,8 @@ export const DashboardPage: React.FC = () => {
                 setViewMode('knockout');
                 setFilter('all');
               }}
-              className={`flex-1 py-1.5 text-[11px] font-bold rounded-lg transition-all duration-200 text-center ${
-                viewMode === 'knockout' ? 'bg-white/10 text-white shadow-sm' : 'text-white/40 hover:text-white/60'
-              }`}
+              className={`flex-1 py-2 text-xs font-black rounded-xl transition-all duration-200 text-center font-display ${viewMode === 'knockout' ? 'bg-white/10 text-white shadow-md' : 'text-white/40 hover:text-white/70'
+                }`}
             >
               🌳 Fase Final
             </button>
@@ -241,9 +283,8 @@ export const DashboardPage: React.FC = () => {
                 setViewMode('calendar');
                 setFilter('all');
               }}
-              className={`flex-1 py-1.5 text-[11px] font-bold rounded-lg transition-all duration-200 text-center ${
-                viewMode === 'calendar' ? 'bg-white/10 text-white shadow-sm' : 'text-white/40 hover:text-white/60'
-              }`}
+              className={`flex-1 py-2 text-xs font-black rounded-xl transition-all duration-200 text-center font-display ${viewMode === 'calendar' ? 'bg-white/10 text-white shadow-md' : 'text-white/40 hover:text-white/70'
+                }`}
             >
               📅 Calendario
             </button>
@@ -251,7 +292,7 @@ export const DashboardPage: React.FC = () => {
 
           {/* Sub-Navegación Dinámica según viewMode */}
           {viewMode === 'groups' && (
-            <div className="flex items-center gap-1.5 overflow-x-auto pb-1 scrollbar-hide">
+            <div className="flex items-center gap-1.5 overflow-x-auto pb-1.5 scrollbar-hide">
               {GROUPS_LIST.map((g) => {
                 const pending = getPendingInGroup(g);
                 return (
@@ -261,15 +302,14 @@ export const DashboardPage: React.FC = () => {
                       setActiveGroup(g);
                       setShowStandings(false);
                     }}
-                    className={`relative px-3 py-1 rounded-lg text-xs font-bold transition-all duration-200 flex-shrink-0 ${
-                      activeGroup === g
-                        ? 'bg-verde-400/20 text-verde-400 border border-verde-400/30'
-                        : 'bg-white/5 text-white/40 border border-transparent hover:text-white/70'
-                    }`}
+                    className={`relative px-4 py-1.5 rounded-full text-xs font-extrabold transition-all duration-200 flex-shrink-0 border ${activeGroup === g
+                        ? 'bg-verde-500/15 text-verde-400 border-verde-400/40 shadow-glow-verde'
+                        : 'bg-white/5 text-white/50 border-transparent hover:text-white/80 hover:bg-white/10'
+                      }`}
                   >
                     Grupo {g}
                     {pending > 0 && (
-                      <span className="absolute top-0 right-0 w-1.5 h-1.5 bg-dorado-400 rounded-full animate-pulse" />
+                      <span className="absolute -top-0.5 -right-0.5 w-2 h-2 bg-dorado-400 rounded-full border border-pitch-900 animate-pulse" />
                     )}
                   </button>
                 );
@@ -278,22 +318,21 @@ export const DashboardPage: React.FC = () => {
           )}
 
           {viewMode === 'knockout' && (
-            <div className="flex items-center gap-1.5 overflow-x-auto pb-1 scrollbar-hide">
+            <div className="flex items-center gap-1.5 overflow-x-auto pb-1.5 scrollbar-hide">
               {ROUNDS_LIST.map((r) => {
                 const pending = getPendingInRound(r.id);
                 return (
                   <button
                     key={r.id}
                     onClick={() => setActiveRound(r.id)}
-                    className={`relative px-3.5 py-1 rounded-lg text-xs font-bold transition-all duration-200 flex-shrink-0 ${
-                      activeRound === r.id
-                        ? 'bg-verde-400/20 text-verde-400 border border-verde-400/30'
-                        : 'bg-white/5 text-white/40 border border-transparent hover:text-white/70'
-                    }`}
+                    className={`relative px-4 py-1.5 rounded-full text-xs font-extrabold transition-all duration-200 flex-shrink-0 border ${activeRound === r.id
+                        ? 'bg-verde-500/15 text-verde-400 border-verde-400/40 shadow-glow-verde'
+                        : 'bg-white/5 text-white/50 border-transparent hover:text-white/80 hover:bg-white/10'
+                      }`}
                   >
                     {r.label}
                     {pending > 0 && (
-                      <span className="absolute top-0 right-0 w-1.5 h-1.5 bg-dorado-400 rounded-full animate-pulse" />
+                      <span className="absolute -top-0.5 -right-0.5 w-2 h-2 bg-dorado-400 rounded-full border border-pitch-900 animate-pulse" />
                     )}
                   </button>
                 );
@@ -302,7 +341,7 @@ export const DashboardPage: React.FC = () => {
           )}
 
           {viewMode === 'calendar' && (
-            <div className="flex items-center gap-1.5 overflow-x-auto pb-1 scrollbar-hide">
+            <div className="flex items-center gap-1.5 overflow-x-auto pb-1.5 scrollbar-hide">
               {calendarFilters.map((f) => {
                 const count =
                   f.id === 'all' ? matches.length : matches.filter((m) => m.status === f.id).length;
@@ -311,18 +350,17 @@ export const DashboardPage: React.FC = () => {
                     key={f.id}
                     id={`filter-${f.id}`}
                     onClick={() => setFilter(f.id)}
-                    className={`flex items-center gap-1 px-2.5 py-1 rounded-lg text-xs font-bold whitespace-nowrap transition-all duration-200 flex-shrink-0 ${
-                      filter === f.id
-                        ? 'bg-verde-400/20 text-verde-400 border border-verde-400/30'
-                        : 'text-white/40 hover:text-white/70 hover:bg-white/5'
-                    }`}
+                    className={`flex items-center gap-1.5 px-4 py-1.5 rounded-full text-xs font-extrabold whitespace-nowrap transition-all duration-200 flex-shrink-0 border ${filter === f.id
+                        ? 'bg-verde-500/15 text-verde-400 border-verde-400/40 shadow-glow-verde'
+                        : 'bg-white/5 text-white/50 border-transparent hover:text-white/80 hover:bg-white/10'
+                      }`}
                   >
-                    {f.emoji} {f.label}
+                    <span>{f.emoji}</span>
+                    <span>{f.label}</span>
                     {count > 0 && (
                       <span
-                        className={`ml-1 px-1 py-0.2 rounded-full text-[9px] ${
-                          filter === f.id ? 'bg-verde-400/30 text-verde-400' : 'bg-white/10 text-white/40'
-                        }`}
+                        className={`ml-1 px-2 py-0.5 rounded-full text-[10px] font-black ${filter === f.id ? 'bg-verde-400/25 text-verde-400' : 'bg-white/10 text-white/40'
+                          }`}
                       >
                         {count}
                       </span>
@@ -372,9 +410,8 @@ export const DashboardPage: React.FC = () => {
             <p className="text-white/40 font-medium text-sm">
               {filter === 'all'
                 ? 'No hay partidos en esta sección'
-                : `No hay partidos ${
-                    filter === 'upcoming' ? 'próximos' : filter === 'live' ? 'en vivo' : 'finalizados'
-                  }`}
+                : `No hay partidos ${filter === 'upcoming' ? 'próximos' : filter === 'live' ? 'en vivo' : 'finalizados'
+                }`}
             </p>
           </div>
         ) : (

@@ -1,5 +1,5 @@
 // ============================================================
-//  TIPOS GLOBALES — Polla del Mundia
+//  TIPOS GLOBALES — Polla del Mundial
 // ============================================================
 
 export interface User {

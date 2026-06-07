@@ -187,7 +187,7 @@ async function runTests() {
       homeScore: 2,
       awayScore: 1,
       status: 'finished',
-      adminPassword: 'mundia2026'
+      adminPassword: 'mundial2026'
     });
 
     if (!updateMatchRes.success) {
@@ -277,7 +277,7 @@ async function runTests() {
 
     // A. Agregar un partido de forma manual (apiAddMatch)
     console.log('Creando un partido manual (Admin)...');
-    const addMatchRes = await apiAddMatch('mundia2026', 'Colombia', 'Argentina', '2026-06-25', '18:00', 'GRUPO_TEST');
+    const addMatchRes = await apiAddMatch('mundial2026', 'Colombia', 'Argentina', '2026-06-25', '18:00', 'GRUPO_TEST');
     let testMatchId = '';
     if (addMatchRes.success && addMatchRes.data) {
       testMatchId = addMatchRes.data.matchId;
@@ -291,7 +291,7 @@ async function runTests() {
     const overrideRes = await apiUpdateMatch({
       matchId: 'API_73',
       homeTeam: 'Italia',
-      adminPassword: 'mundia2026'
+      adminPassword: 'mundial2026'
     });
     if (!overrideRes.success) throw new Error('Error al aplicar override: ' + overrideRes.error);
 
@@ -330,7 +330,7 @@ async function runTests() {
     const unlockRes = await apiUpdateMatch({
       matchId: 'API_73',
       unlock: true,
-      adminPassword: 'mundia2026'
+      adminPassword: 'mundial2026'
     });
     if (!unlockRes.success) throw new Error('Error al desbloquear el partido: ' + unlockRes.error);
 
@@ -351,7 +351,7 @@ async function runTests() {
 
     // E. Forzar recálculo manual desde Admin (apiSyncMatches)
     console.log('Forzando recálculo manual de puntos desde Admin...');
-    const syncRes = await apiSyncMatches('mundia2026');
+    const syncRes = await apiSyncMatches('mundial2026');
     if (syncRes.success && syncRes.data?.success) {
       console.log('✅ Recálculo manual forzado ejecutado con éxito.');
     } else {

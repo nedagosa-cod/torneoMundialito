@@ -208,7 +208,7 @@ const RegisterInfo: React.FC<RegisterFormProps> = ({ onSwitch }) => {
           Registro vía Google Forms
         </h3>
         <p className="text-white/50 text-xs leading-relaxed text-center">
-          Para participar en la Polla del Mundia, debes completar el
+          Para participar en la Polla del Mundial, debes completar el
           <strong className="text-white/70"> formulario de registro</strong> proporcionado
           por la organización.
         </p>
@@ -258,7 +258,7 @@ export const LoginPage: React.FC = () => {
   return (
     <div
       className="min-h-screen flex flex-col items-center justify-center px-4 py-8 relative overflow-hidden"
-      style={{ background: 'linear-gradient(160deg, #020c06 0%, #041a0d 60%, #020c06 100%)' }}
+      style={{ background: 'linear-gradient(160deg, #050814 0%, #080f24 60%, #0a2e19 100%)' }}
     >
       {/* Partículas de fondo */}
       <Particles />
@@ -266,62 +266,61 @@ export const LoginPage: React.FC = () => {
       {/* Círculos de luz ambiente */}
       <div
         className="absolute top-1/3 left-1/2 -translate-x-1/2 -translate-y-1/2 w-80 h-80 rounded-full pointer-events-none"
-        style={{ background: 'radial-gradient(circle, rgba(34,197,94,0.10) 0%, transparent 70%)', filter: 'blur(40px)' }}
+        style={{ background: 'radial-gradient(circle, rgba(0,255,135,0.12) 0%, transparent 70%)', filter: 'blur(40px)' }}
       />
       <div
         className="absolute bottom-1/4 right-1/4 w-64 h-64 rounded-full pointer-events-none"
-        style={{ background: 'radial-gradient(circle, rgba(251,191,36,0.07) 0%, transparent 70%)', filter: 'blur(30px)' }}
+        style={{ background: 'radial-gradient(circle, rgba(255,215,0,0.08) 0%, transparent 70%)', filter: 'blur(30px)' }}
       />
 
       <div className="w-full max-w-sm relative z-10">
         {/* Logo */}
         <div className="flex flex-col items-center mb-6">
           <div
-            className="w-20 h-20 rounded-3xl flex items-center justify-center mb-4"
+            className="w-20 h-20 rounded-3xl flex items-center justify-center mb-4 relative"
             style={{
-              background: 'linear-gradient(135deg, rgba(251,191,36,0.15), rgba(34,197,94,0.1))',
-              border: '1px solid rgba(251,191,36,0.25)',
-              boxShadow: '0 0 30px rgba(251,191,36,0.15), 0 0 60px rgba(34,197,94,0.08)',
+              background: 'linear-gradient(135deg, rgba(255,215,0,0.15), rgba(0,255,135,0.10))',
+              border: '1px solid rgba(255,215,0,0.3)',
+              boxShadow: '0 0 30px rgba(255,215,0,0.2), 0 0 60px rgba(0,255,135,0.1)',
             }}
           >
             <span className="text-4xl select-none" style={{ animationName: 'none' }}>🏆</span>
           </div>
           <h1
-            className="font-display font-black text-3xl text-center"
+            className="font-display font-black text-3xl text-center tracking-wide"
             style={{
-              background: 'linear-gradient(135deg, #fbbf24 0%, #22c55e 100%)',
+              background: 'linear-gradient(135deg, #ffe359 0%, #00ff87 100%)',
               WebkitBackgroundClip: 'text',
               WebkitTextFillColor: 'transparent',
               backgroundClip: 'text',
             }}
           >
-            Polla del Mundia
+            Polla del Mundial
           </h1>
-          <p className="text-white/35 text-sm font-medium mt-1">
+          <p className="text-white/40 text-xs font-semibold uppercase tracking-wider mt-1.5">
             {mode === 'login' ? '¡Bienvenido de vuelta! 👋' : '¡Únete a la competencia! 🔥'}
           </p>
         </div>
 
         {/* Card principal */}
         <div
-          className="rounded-2xl p-6 border border-white/8"
+          className="rounded-3xl p-6 border border-white/10"
           style={{
-            background: 'linear-gradient(135deg, rgba(255,255,255,0.06) 0%, rgba(255,255,255,0.02) 100%)',
-            backdropFilter: 'blur(20px)',
-            boxShadow: '0 20px 60px rgba(0,0,0,0.5), 0 0 0 1px rgba(255,255,255,0.04)',
+            background: 'linear-gradient(135deg, rgba(255,255,255,0.05) 0%, rgba(255,255,255,0.01) 100%)',
+            backdropFilter: 'blur(24px)',
+            boxShadow: '0 24px 60px rgba(0,0,0,0.6), 0 0 0 1px rgba(255,255,255,0.04)',
           }}
         >
           {/* Tabs Login / Registro */}
-          <div className="flex rounded-xl p-1 mb-5" style={{ background: 'rgba(0,0,0,0.3)' }}>
+          <div className="flex rounded-2xl p-1 mb-5 bg-pitch-950 border border-white/5 shadow-inner">
             <button
               id="tab-login"
               type="button"
               onClick={() => switchMode('login')}
-              className={`flex-1 py-2 rounded-lg text-sm font-bold font-display transition-all duration-200 ${
-                mode === 'login'
-                  ? 'bg-verde-500 text-white shadow-lg'
+              className={`flex-1 py-2.5 rounded-xl text-xs font-black font-display transition-all duration-200 ${mode === 'login'
+                  ? 'bg-gradient-verde text-pitch-950 shadow-md'
                   : 'text-white/40 hover:text-white/60'
-              }`}
+                }`}
             >
               ⚽ Ingresar
             </button>
@@ -329,11 +328,10 @@ export const LoginPage: React.FC = () => {
               id="tab-register"
               type="button"
               onClick={() => switchMode('register')}
-              className={`flex-1 py-2 rounded-lg text-sm font-bold font-display transition-all duration-200 ${
-                mode === 'register'
-                  ? 'bg-dorado-500 text-black shadow-lg'
+              className={`flex-1 py-2.5 rounded-xl text-xs font-black font-display transition-all duration-200 ${mode === 'register'
+                  ? 'bg-gradient-gold text-pitch-950 shadow-md'
                   : 'text-white/40 hover:text-white/60'
-              }`}
+                }`}
             >
               🏆 Registrarse
             </button>
@@ -348,9 +346,9 @@ export const LoginPage: React.FC = () => {
         </div>
 
         {/* Scoring legend */}
-        <div className="mt-5 flex items-center justify-center gap-5 text-xs text-white/25">
-          <span>🥇 Exacto: <strong className="text-dorado-400/70">3 pts</strong></span>
-          <span>⚽ Resultado: <strong className="text-verde-400/70">1 pt</strong></span>
+        <div className="mt-6 flex items-center justify-center gap-4 text-[10px] text-white/35 font-bold uppercase tracking-wider bg-white/5 border border-white/5 py-2 px-3 rounded-2xl">
+          <span>🥇 Exacto: <strong className="text-dorado-300">3 pts</strong></span>
+          <span>⚽ Resultado: <strong className="text-verde-400">1 pt</strong></span>
           <span>❌ Fallo: <strong>0 pts</strong></span>
         </div>
       </div>

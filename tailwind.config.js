@@ -7,32 +7,32 @@ export default {
   theme: {
     extend: {
       colors: {
-        // Paleta principal — verde oscuro profundo
+        // Paleta principal — Azul noche de estadio fusionado con verde césped
         pitch: {
-          950: '#020c06',
-          900: '#041a0d',
-          800: '#072b15',
-          700: '#0a3d1e',
-          600: '#0d5028',
+          950: '#050814', // Fondo ultra oscuro noche
+          900: '#080f24', // Fondo noche estadio
+          800: '#111b3d', // Azul noche de interfaz
+          700: '#1d2a5c', // Azul panel
+          600: '#2c3d82', // Azul borde
         },
-        // Acento verde vibrante
+        // Acento verde esmeril / césped eléctrico
         verde: {
-          400: '#22c55e',
-          500: '#16a34a',
-          600: '#15803d',
+          400: '#00ff87', // Verde neón eléctrico
+          500: '#00d66c', // Verde césped vibrante
+          600: '#02a853', // Verde esmeralda rico
         },
-        // Acento dorado
+        // Acento dorado trofeo
         dorado: {
-          300: '#fcd34d',
-          400: '#fbbf24',
-          500: '#f59e0b',
-          600: '#d97706',
+          300: '#ffe359', // Dorado brillante
+          400: '#ffd700', // Oro puro trofeo
+          500: '#e5a900', // Oro medio
+          600: '#b78000', // Oro bronceado
         },
         // Glass/surface
         glass: {
-          100: 'rgba(255,255,255,0.05)',
-          200: 'rgba(255,255,255,0.10)',
-          300: 'rgba(255,255,255,0.15)',
+          100: 'rgba(255,255,255,0.03)',
+          200: 'rgba(255,255,255,0.06)',
+          300: 'rgba(255,255,255,0.10)',
         },
       },
       fontFamily: {
@@ -41,16 +41,16 @@ export default {
       },
       backgroundImage: {
         'stadium': "url('/stadium-bg.svg')",
-        'gradient-pitch': 'linear-gradient(135deg, #020c06 0%, #041a0d 50%, #072b15 100%)',
-        'gradient-gold': 'linear-gradient(135deg, #fbbf24, #f59e0b, #d97706)',
-        'gradient-verde': 'linear-gradient(135deg, #22c55e, #16a34a)',
-        'gradient-card': 'linear-gradient(135deg, rgba(255,255,255,0.08) 0%, rgba(255,255,255,0.03) 100%)',
+        'gradient-pitch': 'linear-gradient(135deg, #050814 0%, #080f24 50%, #0a2e19 100%)', // Degradado azul-verde
+        'gradient-gold': 'linear-gradient(135deg, #ffe359, #ffd700, #b78000)',
+        'gradient-verde': 'linear-gradient(135deg, #00ff87, #00d66c)',
+        'gradient-card': 'linear-gradient(135deg, rgba(255,255,255,0.06) 0%, rgba(255,255,255,0.01) 100%)',
       },
       boxShadow: {
-        'glow-verde': '0 0 20px rgba(34,197,94,0.3)',
-        'glow-gold': '0 0 20px rgba(251,191,36,0.4)',
-        'card': '0 8px 32px rgba(0,0,0,0.4)',
-        'card-hover': '0 12px 40px rgba(0,0,0,0.6)',
+        'glow-verde': '0 0 20px rgba(0,255,135,0.25)',
+        'glow-gold': '0 0 25px rgba(255,215,0,0.35)',
+        'card': '0 12px 32px rgba(0,0,0,0.5)',
+        'card-hover': '0 16px 48px rgba(0,0,0,0.7)',
       },
       animation: {
         'float': 'float 3s ease-in-out infinite',

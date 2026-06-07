@@ -41,22 +41,22 @@ interface StatusBadgeProps {
 export const StatusBadge: React.FC<StatusBadgeProps> = ({ status }) => {
   if (status === 'live') {
     return (
-      <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-bold bg-red-500/20 text-red-400 border border-red-500/30">
+      <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md text-[9px] font-black uppercase tracking-wider bg-red-500/15 text-red-400 border border-red-500/25 shadow-sm shadow-red-500/5">
         <span className="w-1.5 h-1.5 rounded-full bg-red-400 animate-ping inline-block" />
-        EN VIVO
+        En Vivo
       </span>
     );
   }
   if (status === 'finished') {
     return (
-      <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-bold bg-white/10 text-white/50">
-        ✓ FINALIZADO
+      <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-md text-[9px] font-black uppercase tracking-wider bg-white/5 border border-white/10 text-white/40">
+        ✓ Finalizado
       </span>
     );
   }
   return (
-    <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-bold bg-dorado-400/10 text-dorado-400 border border-dorado-400/30">
-      🕐 PRÓXIMO
+    <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-md text-[9px] font-black uppercase tracking-wider bg-dorado-500/10 text-dorado-400 border border-dorado-400/20 shadow-sm shadow-dorado-500/5">
+      🕐 Próximo
     </span>
   );
 };

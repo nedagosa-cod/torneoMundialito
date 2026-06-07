@@ -61,15 +61,21 @@ function getFlag(team: string): React.ReactNode {
   const code = FLAG_CODE_MAP[team];
   if (code) {
     return (
-      <img
-        src={`https://flagcdn.com/w80/${code}.png`}
-        alt={`Bandera de ${team}`}
-        className="w-9 h-6 object-cover rounded border border-white/10 shadow-sm inline-block"
-        loading="lazy"
-      />
+      <div className="relative inline-block overflow-hidden rounded-lg border border-white/15 shadow-md transition-transform duration-300 hover:scale-105">
+        <img
+          src={`https://flagcdn.com/w80/${code}.png`}
+          alt={`Bandera de ${team}`}
+          className="w-12 h-8 object-cover block"
+          loading="lazy"
+        />
+      </div>
     );
   }
-  return <span className="text-2xl">🏆</span>;
+  return (
+    <div className="w-12 h-8 flex items-center justify-center rounded-lg border border-white/15 bg-white/5 text-sm">
+      🏆
+    </div>
+  );
 }
 
 function formatTimeToAMPM(timeStr: string): string {
@@ -173,6 +179,20 @@ export const MatchCard: React.FC<MatchCardProps> = ({ match }) => {
     }
   };
 
+  const adjustHomeScore = (amount: number) => {
+    if (!canPredict) return;
+    const current = homeVal === '' ? 0 : parseInt(homeVal);
+    const newVal = Math.max(0, current + amount);
+    setDraft(match.matchId, String(newVal), awayVal);
+  };
+
+  const adjustAwayScore = (amount: number) => {
+    if (!canPredict) return;
+    const current = awayVal === '' ? 0 : parseInt(awayVal);
+    const newVal = Math.max(0, current + amount);
+    setDraft(match.matchId, homeVal, String(newVal));
+  };
+
   const hasDraftChanged =
     prediction
       ? homeVal !== String(prediction.homeScore) || awayVal !== String(prediction.awayScore)
@@ -183,137 +203,197 @@ export const MatchCard: React.FC<MatchCardProps> = ({ match }) => {
   return (
     <div
       id={`match-card-${match.matchId}`}
-      className={`glass-card-hover p-2.5 animate-slide-up transition-all duration-300 ${
-        isFinished ? 'opacity-80' : ''
-      } ${pointsResult === 'exact' ? 'border-dorado-400/40' : ''}`}
+      className={`glass-card-hover p-4 animate-slide-up transition-all duration-300 relative overflow-hidden ${
+        isFinished ? 'opacity-85' : ''
+      } ${pointsResult === 'exact' ? 'border-dorado-400/40 shadow-glow-gold bg-dorado-500/5' : ''}`}
     >
+      {/* Indicador de resultado exacto */}
+      {pointsResult === 'exact' && (
+        <div className="absolute top-0 right-0 bg-gradient-gold px-2.5 py-0.5 rounded-bl-lg text-[9px] font-black text-pitch-950 uppercase tracking-widest">
+          🏆 Exacto
+        </div>
+      )}
+
       {/* Header: Grupo + Status */}
-      <div className="flex items-center justify-between mb-1.5">
-        <span className="text-[9px] font-bold text-white/40 tracking-wider uppercase">
+      <div className="flex items-center justify-between mb-2">
+        <span className="text-[10px] font-extrabold text-white/50 tracking-widest uppercase">
           Grupo {match.group}
         </span>
         <StatusBadge status={match.status} />
       </div>
 
       {/* Equipos y marcadores */}
-      <div className="flex items-center justify-between gap-1.5 mb-2">
+      <div className="flex items-center justify-between gap-2 mb-3">
         {/* Local */}
-        <div className="flex-1 flex flex-col items-center gap-0.5">
+        <div className="flex-1 flex flex-col items-center gap-1">
           <span className="animate-float" style={{ animationDelay: '0s' }}>
             {getFlag(match.homeTeam)}
           </span>
-          <span className="text-[11px] font-bold text-white text-center leading-tight">
+          <span className="text-xs font-black text-white text-center leading-tight">
             {match.homeTeam}
           </span>
           {isFinished && (
-            <span className="text-lg font-display font-black text-verde-400">
+            <span className="text-2xl font-display font-black text-verde-400 mt-1">
               {match.homeScore}
             </span>
           )}
         </div>
 
         {/* Centro */}
-        <div className="flex flex-col items-center gap-0.5 min-w-[70px]">
+        <div className="flex flex-col items-center gap-1 min-w-[80px]">
           {isFinished ? (
-            <span className="text-[8px] font-bold text-white/40">RESULTADO</span>
+            <span className="text-[9px] font-bold text-white/40 bg-white/5 px-2 py-0.5 rounded-full uppercase tracking-wider">
+              Marcador
+            </span>
           ) : (
-            <span className="text-[9px] text-white/30 font-medium text-center leading-none">
+            <span className="text-[10px] text-white/45 font-semibold text-center leading-none">
               {formatMatchDate(match.matchDate, match.matchTime)}
             </span>
           )}
-          <span className="text-white/10 font-display font-black text-xs">VS</span>
+          <span className="text-white/15 font-display font-black text-sm">VS</span>
           {isFinished && (
-            <span className="text-[9px] text-white/30 font-medium text-center leading-none">
+            <span className="text-[10px] text-white/30 font-medium text-center leading-none">
               {formatMatchDate(match.matchDate)}
             </span>
           )}
         </div>
 
         {/* Visitante */}
-        <div className="flex-1 flex flex-col items-center gap-0.5">
+        <div className="flex-1 flex flex-col items-center gap-1">
           <span className="animate-float" style={{ animationDelay: '0.5s' }}>
             {getFlag(match.awayTeam)}
           </span>
-          <span className="text-[11px] font-bold text-white text-center leading-tight">
+          <span className="text-xs font-black text-white text-center leading-tight">
             {match.awayTeam}
           </span>
           {isFinished && (
-            <span className="text-lg font-display font-black text-verde-400">
+            <span className="text-2xl font-display font-black text-verde-400 mt-1">
               {match.awayScore}
             </span>
           )}
         </div>
       </div>
 
-      {/* Separador */}
-      <div className="h-px bg-white/5 mb-2.5" />
+      {/* Separador con aspecto de ticket cortado */}
+      <div className="relative h-px bg-white/10 my-3">
+        <div className="absolute -left-5 -top-1.5 w-3 h-3 rounded-full bg-pitch-950" />
+        <div className="absolute -right-5 -top-1.5 w-3 h-3 rounded-full bg-pitch-950" />
+      </div>
 
       {/* Predicción */}
-      <div className="space-y-1.5">
-        <p className="text-[10px] text-white/40 text-center font-semibold uppercase tracking-wider">
+      <div className="space-y-3">
+        <p className="text-[10px] text-white/40 text-center font-bold uppercase tracking-widest">
           {isFinished ? 'Mi Predicción' : 'Tu Predicción'}
         </p>
 
-        {/* Inputs de predicción */}
-        <div className="flex items-center justify-center gap-3">
-          <input
-            id={`pred-home-${match.matchId}`}
-            type="number"
-            min="0"
-            max="99"
-            className="score-input"
-            placeholder="0"
-            value={homeVal}
-            onChange={(e) => setDraft(match.matchId, e.target.value, awayVal)}
-            disabled={!canPredict}
-            aria-label={`Goles ${match.homeTeam}`}
-          />
+        {/* Inputs de predicción con controles táctiles */}
+        <div className="flex items-center justify-center gap-4">
+          {/* Local score control */}
+          <div className="flex items-center gap-1.5">
+            {canPredict && (
+              <button
+                type="button"
+                onClick={() => adjustHomeScore(-1)}
+                className="btn-adjust w-10 h-10"
+                aria-label="Restar gol local"
+              >
+                —
+              </button>
+            )}
+            <input
+              id={`pred-home-${match.matchId}`}
+              type="number"
+              min="0"
+              max="99"
+              className="score-input"
+              placeholder="0"
+              value={homeVal}
+              onChange={(e) => setDraft(match.matchId, e.target.value, awayVal)}
+              disabled={!canPredict}
+              aria-label={`Goles ${match.homeTeam}`}
+            />
+            {canPredict && (
+              <button
+                type="button"
+                onClick={() => adjustHomeScore(1)}
+                className="btn-adjust w-10 h-10"
+                aria-label="Sumar gol local"
+              >
+                +
+              </button>
+            )}
+          </div>
 
-          <span className="text-white/30 font-display font-black text-xl">:</span>
+          <span className="text-white/20 font-display font-black text-xl select-none">:</span>
 
-          <input
-            id={`pred-away-${match.matchId}`}
-            type="number"
-            min="0"
-            max="99"
-            className="score-input"
-            placeholder="0"
-            value={awayVal}
-            onChange={(e) => setDraft(match.matchId, homeVal, e.target.value)}
-            disabled={!canPredict}
-            aria-label={`Goles ${match.awayTeam}`}
-          />
+          {/* Away score control */}
+          <div className="flex items-center gap-1.5">
+            {canPredict && (
+              <button
+                type="button"
+                onClick={() => adjustAwayScore(-1)}
+                className="btn-adjust w-10 h-10"
+                aria-label="Restar gol visitante"
+              >
+                —
+              </button>
+            )}
+            <input
+              id={`pred-away-${match.matchId}`}
+              type="number"
+              min="0"
+              max="99"
+              className="score-input"
+              placeholder="0"
+              value={awayVal}
+              onChange={(e) => setDraft(match.matchId, homeVal, e.target.value)}
+              disabled={!canPredict}
+              aria-label={`Goles ${match.awayTeam}`}
+            />
+            {canPredict && (
+              <button
+                type="button"
+                onClick={() => adjustAwayScore(1)}
+                className="btn-adjust w-10 h-10"
+                aria-label="Sumar gol visitante"
+              >
+                +
+              </button>
+            )}
+          </div>
         </div>
 
         {/* Badge de puntos o botón guardar */}
-        <div className="flex items-center justify-center">
+        <div className="flex items-center justify-center pt-1">
           {isFinished && prediction ? (
             <PointsBadge points={prediction.points} result={pointsResult} large />
           ) : isFinished ? (
             <span className="text-xs text-white/30 italic">No predijiste este partido</span>
           ) : !canPredict ? (
             prediction ? (
-              <span className="text-xs text-white/50 font-semibold bg-white/5 border border-white/10 px-3 py-1.5 rounded-xl flex items-center gap-1.5">
+              <span className="text-xs text-white/60 font-semibold bg-white/5 border border-white/10 px-4 py-2 rounded-xl flex items-center gap-2">
                 🔒 Cerrado · Tu predicción: {prediction.homeScore} – {prediction.awayScore}
               </span>
             ) : (
-              <span className="text-xs text-red-400/85 font-semibold bg-red-500/5 border border-red-500/10 px-3 py-1.5 rounded-xl">
+              <span className="text-xs text-red-400/80 font-bold bg-red-500/5 border border-red-500/15 px-4 py-2 rounded-xl">
                 🔒 Cerrado · No predicho
               </span>
             )
           ) : saved ? (
-            <span className="text-verde-400 text-sm font-bold flex items-center gap-1 animate-bounce-in">
+            <span className="text-verde-400 text-sm font-black flex items-center gap-1 animate-bounce-in">
               ✓ ¡Predicción guardada!
             </span>
           ) : (
             <Button
               id={`save-pred-${match.matchId}`}
-              variant="primary"
+              variant={canSave ? 'gold' : 'primary'}
               size="sm"
               loading={saving}
               disabled={!canSave}
               onClick={handleSave}
-              className="w-full max-w-xs"
+              className={`w-full max-w-xs transition-all duration-300 ${
+                canSave ? 'shadow-glow-gold animate-pulse text-pitch-950 font-black' : ''
+              }`}
             >
               {prediction && !hasDraftChanged ? '✓ Guardado' : '💾 Guardar Predicción'}
             </Button>
