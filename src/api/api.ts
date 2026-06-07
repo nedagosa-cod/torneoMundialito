@@ -604,9 +604,16 @@ function calculateBestThirdPlacedTeams(matches: DBMatch[]): TeamStats[] {
   const thirds: TeamStats[] = [];
   const groups = ['A','B','C','D','E','F','G','H','I','J','K','L'];
   groups.forEach(g => {
-    const standings = calculateGroupStandings(matches, g);
-    if (standings.length >= 3) {
-      thirds.push(standings[2]);
+    // Solo consideramos terceros lugares de grupos cuyos partidos estén 100% finalizados
+    const groupMatches = matches.filter(
+      m => m.group === g && m.match_type.replace('_locked', '') === 'group'
+    );
+    const allFinished = groupMatches.length > 0 && groupMatches.every(m => m.status === 'finished');
+    if (allFinished) {
+      const standings = calculateGroupStandings(matches, g);
+      if (standings.length >= 3) {
+        thirds.push(standings[2]);
+      }
     }
   });
 
@@ -713,11 +720,20 @@ export async function autoPropagateTeamsSupabase(): Promise<void> {
   };
 
   function getTeamByRank(group: string, rank: number): string | null {
+    // Solo propagamos si todos los partidos de la fase de grupos de este grupo están finalizados
+    const groupMatches = matches.filter(
+      m => m.group === group && m.match_type.replace('_locked', '') === 'group'
+    );
+    const allFinished = groupMatches.length > 0 && groupMatches.every(m => m.status === 'finished');
+    if (!allFinished) {
+      return 'Por definir';
+    }
+
     const list = groupStandings[group] || [];
     if (list.length >= rank) {
       return list[rank - 1].team;
     }
-    return null;
+    return 'Por definir';
   }
 
   // 1. Propagación desde fase de grupos a Dieciseisavos (Round of 32)
@@ -740,9 +756,7 @@ export async function autoPropagateTeamsSupabase(): Promise<void> {
       if (homeTeam) m.home_team = homeTeam;
       
       const assignedThird = thirdPlaceAssignments[matchId];
-      if (assignedThird) {
-        m.away_team = assignedThird;
-      }
+      m.away_team = assignedThird || 'Por definir';
     }
   });
 
@@ -781,7 +795,7 @@ export async function autoPropagateTeamsSupabase(): Promise<void> {
   }
 
   const knockoutOrder = [
-    'API_89', 'API_89', 'API_90', 'API_91', 'API_92', 'API_93', 'API_94', 'API_95', 'API_96',
+    'API_89', 'API_90', 'API_91', 'API_92', 'API_93', 'API_94', 'API_95', 'API_96',
     'API_97', 'API_98', 'API_99', 'API_100',
     'API_101', 'API_102',
     'API_103', 'API_104'
@@ -793,8 +807,8 @@ export async function autoPropagateTeamsSupabase(): Promise<void> {
     if (dep && m && !m.match_type.includes('_locked')) {
       const homeTeam = getKnockoutResult(dep.home, false);
       const awayTeam = getKnockoutResult(dep.away, dep.useLoser || false);
-      if (homeTeam) m.home_team = homeTeam;
-      if (awayTeam) m.away_team = awayTeam;
+      m.home_team = homeTeam || 'Por definir';
+      m.away_team = awayTeam || 'Por definir';
     }
   });
 

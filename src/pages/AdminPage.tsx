@@ -286,6 +286,34 @@ function UpdateMatchForm({ match, adminPassword }: { match: Match; adminPassword
     setLoading(false);
   };
 
+  const handleReset = async () => {
+    const confirmReset = window.confirm(
+      `¿Estás seguro de que deseas reiniciar el partido ${match.homeTeam} vs ${match.awayTeam}? Esto restablecerá los goles a vacío, el estado a "Por jugar" (upcoming) y recalculará los puntos de las predicciones.`
+    );
+    if (!confirmReset) return;
+
+    setLoading(true);
+    setResult(null);
+
+    const ok = await updateMatch({
+      matchId: match.matchId,
+      homeScore: null,
+      awayScore: null,
+      status: 'upcoming',
+      unlock: true,
+      password: adminPassword
+    });
+
+    if (ok) {
+      setHomeScore('');
+      setAwayScore('');
+      setStatus('upcoming');
+    }
+
+    setResult({ ok, msg: ok ? '🔄 Partido restablecido' : '❌ Error al restablecer' });
+    setLoading(false);
+  };
+
   const isLocked = match.matchType?.includes('_locked');
 
   return (
@@ -391,7 +419,7 @@ function UpdateMatchForm({ match, adminPassword }: { match: Match; adminPassword
 
       {/* Acciones */}
       <div className="flex items-center justify-between gap-2 pt-2 border-t border-white/5">
-        <div>
+        <div className="flex items-center gap-1.5">
           {isLocked && (
             <button
               onClick={handleUnlock}
@@ -399,6 +427,16 @@ function UpdateMatchForm({ match, adminPassword }: { match: Match; adminPassword
               className="text-[10px] px-2 py-1 rounded-lg bg-white/5 hover:bg-white/10 text-white/50 hover:text-white/80 border border-white/10 transition-all font-semibold"
             >
               🔓 Auto-calcular
+            </button>
+          )}
+          {(match.homeScore !== null || match.awayScore !== null || match.status !== 'upcoming') && (
+            <button
+              onClick={handleReset}
+              disabled={loading}
+              className="text-[10px] px-2 py-1 rounded-lg bg-red-500/10 hover:bg-red-500/20 text-red-400 border border-red-500/20 transition-all font-semibold"
+              title="Reiniciar partido a estado inicial"
+            >
+              🔄 Reiniciar
             </button>
           )}
         </div>
