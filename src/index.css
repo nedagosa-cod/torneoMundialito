@@ -234,3 +234,9 @@ body {
 .page-enter {
   animation: slide-up 0.35s ease-out;
 }
+
+/* Fix dropdown options visibility in dark mode */
+select option {
+  background-color: #0d1e13; /* Dark green background */
+  color: #f0fdf4;            /* Off-white text */
+}

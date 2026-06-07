@@ -13,6 +13,7 @@ import {
   apiGetLeaderboard,
   apiUpdateMatch,
   apiAddMatch,
+  apiGetUserProfile,
 } from '../api/api';
 import type { User, Match, Prediction, LeaderboardEntry, PredictionDraft } from '../types';
 
@@ -47,6 +48,8 @@ interface AppState {
     status?: 'upcoming' | 'live' | 'finished';
     unlock?: boolean;
     password?: string;
+    matchDate?: string;
+    matchTime?: string;
   }) => Promise<boolean>;
   addMatch: (
     password: string, homeTeam: string, awayTeam: string,
@@ -117,8 +120,14 @@ export const useStore = create<AppState>()(
       loadPredictions: async () => {
         const { user } = get();
         if (!user) return;
+        
+        // 1. Cargar predicciones del usuario
         const res = await apiGetPredictions(user.userId);
         if (res.success && res.data) set({ predictions: res.data });
+
+        // 2. Cargar/actualizar puntos y perfil del usuario en tiempo real
+        const userRes = await apiGetUserProfile(user.userId);
+        if (userRes.success && userRes.data) set({ user: userRes.data });
       },
 
       loadLeaderboard: async () => {

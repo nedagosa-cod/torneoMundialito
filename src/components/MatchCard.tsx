@@ -72,12 +72,25 @@ function getFlag(team: string): React.ReactNode {
   return <span className="text-2xl">🏆</span>;
 }
 
+function formatTimeToAMPM(timeStr: string): string {
+  if (!timeStr) return '';
+  const parts = timeStr.split(':');
+  if (parts.length < 2) return timeStr;
+  let hours = parseInt(parts[0], 10);
+  const minutes = parts[1];
+  const ampm = hours >= 12 ? 'PM' : 'AM';
+  hours = hours % 12;
+  hours = hours ? hours : 12; // el número '0' debe ser '12'
+  return `${hours}:${minutes} ${ampm}`;
+}
+
 function formatMatchDate(dateStr: string, timeStr?: string): string {
   try {
     const date = new Date(dateStr + (timeStr ? `T${timeStr}` : ''));
-    return date.toLocaleDateString('es-ES', {
+    const formattedDate = date.toLocaleDateString('es-ES', {
       weekday: 'short', month: 'short', day: 'numeric',
-    }) + (timeStr ? ` · ${timeStr}` : '');
+    });
+    return timeStr ? `${formattedDate} · ${formatTimeToAMPM(timeStr)}` : formattedDate;
   } catch {
     return dateStr;
   }
