@@ -27,6 +27,9 @@ interface AppState {
   isLoading: boolean;
   error: string | null;
   activeTab: 'dashboard' | 'leaderboard' | 'admin';
+  lastMatchesLoad?: number;
+  lastPredictionsLoad?: number;
+  lastLeaderboardLoad?: number;
 
   // ---- Acciones de Auth ----
   login: (username: string, password: string) => Promise<boolean>;
@@ -34,9 +37,9 @@ interface AppState {
   logout: () => void;
 
   // ---- Acciones de Datos ----
-  loadMatches: () => Promise<void>;
-  loadPredictions: () => Promise<void>;
-  loadLeaderboard: () => Promise<void>;
+  loadMatches: (force?: boolean) => Promise<void>;
+  loadPredictions: (force?: boolean) => Promise<void>;
+  loadLeaderboard: (force?: boolean) => Promise<void>;
   savePrediction: (matchId: string, homeScore: number, awayScore: number) => Promise<boolean>;
 
   updateMatch: (params: {
@@ -82,9 +85,9 @@ export const useStore = create<AppState>()(
         if (res.success && res.data) {
           set({ user: res.data, isLoading: false });
           // Cargar datos iniciales
-          get().loadMatches();
-          get().loadPredictions();
-          get().loadLeaderboard();
+          get().loadMatches(true);
+          get().loadPredictions(true);
+          get().loadLeaderboard(true);
           return true;
         }
         set({ error: res.error || 'Error al iniciar sesión', isLoading: false });
@@ -96,8 +99,8 @@ export const useStore = create<AppState>()(
         const res = await apiRegister(firstName, lastName, username, password);
         if (res.success && res.data) {
           set({ user: res.data, isLoading: false });
-          get().loadMatches();
-          get().loadLeaderboard();
+          get().loadMatches(true);
+          get().loadLeaderboard(true);
           return true;
         }
         set({ error: res.error || 'Error al registrarse', isLoading: false });
@@ -108,18 +111,33 @@ export const useStore = create<AppState>()(
         set({
           user: null, matches: [], predictions: [],
           leaderboard: [], drafts: {}, error: null, activeTab: 'dashboard',
+          lastMatchesLoad: undefined,
+          lastPredictionsLoad: undefined,
+          lastLeaderboardLoad: undefined,
         });
       },
 
       // ---- Datos ----
-      loadMatches: async () => {
+      loadMatches: async (force = false) => {
+        const now = Date.now();
+        const { lastMatchesLoad, matches } = get();
+        if (!force && matches.length > 0 && lastMatchesLoad && (now - lastMatchesLoad < 120000)) {
+          return;
+        }
         const res = await apiGetMatches();
-        if (res.success && res.data) set({ matches: res.data });
+        if (res.success && res.data) {
+          set({ matches: res.data, lastMatchesLoad: now });
+        }
       },
 
-      loadPredictions: async () => {
+      loadPredictions: async (force = false) => {
         const { user } = get();
         if (!user) return;
+        const now = Date.now();
+        const { lastPredictionsLoad, predictions } = get();
+        if (!force && predictions.length > 0 && lastPredictionsLoad && (now - lastPredictionsLoad < 120000)) {
+          return;
+        }
 
         // 1. Cargar predicciones del usuario
         const res = await apiGetPredictions(user.userId);
@@ -127,12 +145,21 @@ export const useStore = create<AppState>()(
 
         // 2. Cargar/actualizar puntos y perfil del usuario en tiempo real
         const userRes = await apiGetUserProfile(user.userId);
-        if (userRes.success && userRes.data) set({ user: userRes.data });
+        if (userRes.success && userRes.data) {
+          set({ user: userRes.data, lastPredictionsLoad: now });
+        }
       },
 
-      loadLeaderboard: async () => {
+      loadLeaderboard: async (force = false) => {
+        const now = Date.now();
+        const { lastLeaderboardLoad, leaderboard } = get();
+        if (!force && leaderboard.length > 0 && lastLeaderboardLoad && (now - lastLeaderboardLoad < 120000)) {
+          return;
+        }
         const res = await apiGetLeaderboard();
-        if (res.success && res.data) set({ leaderboard: res.data });
+        if (res.success && res.data) {
+          set({ leaderboard: res.data, lastLeaderboardLoad: now });
+        }
       },
 
       savePrediction: async (matchId, homeScore, awayScore) => {
@@ -147,7 +174,7 @@ export const useStore = create<AppState>()(
             updated[existingIdx] = { ...updated[existingIdx], homeScore, awayScore, points: null };
             set({ predictions: updated, isLoading: false });
           } else {
-            await get().loadPredictions();
+            await get().loadPredictions(true);
             set({ isLoading: false });
           }
           return true;
@@ -162,9 +189,9 @@ export const useStore = create<AppState>()(
         const { password, ...rest } = params;
         const res = await apiUpdateMatch({ ...rest, adminPassword: password });
         if (res.success) {
-          await get().loadMatches();
-          get().loadLeaderboard();
-          get().loadPredictions();
+          await get().loadMatches(true);
+          get().loadLeaderboard(true);
+          get().loadPredictions(true);
           return true;
         }
         set({ error: res.error || 'Error al actualizar partido', isLoading: false });

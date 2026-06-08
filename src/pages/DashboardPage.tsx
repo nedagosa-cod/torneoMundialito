@@ -77,7 +77,7 @@ export const DashboardPage: React.FC = () => {
 
   const handleRefresh = async () => {
     setRefreshing(true);
-    await Promise.all([loadMatches(), loadPredictions(), loadLeaderboard()]);
+    await Promise.all([loadMatches(true), loadPredictions(true), loadLeaderboard(true)]);
     setRefreshing(false);
   };
 

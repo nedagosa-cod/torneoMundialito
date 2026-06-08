@@ -6,8 +6,6 @@ import { apiSyncMatches, apiGetSyncStatus, apiAdminGetUsers, apiResetUserPredict
 import type { AdminUserEntry } from '../api/api';
 import type { Match, SyncStatus } from '../types';
 
-const ADMIN_STORAGE_KEY = 'polla-admin-auth';
-const ADMIN_PASSWORD_KEY = 'polla-admin-password';
 
 // ============================================================
 //  Helper: formatear fecha de última sincronización
@@ -70,7 +68,7 @@ function SyncPanel({ adminPassword }: { adminPassword: string }) {
           detail: `${d.syncedNew} partidos nuevos · ${d.updated} actualizados · ${d.newlyFinished} terminados`,
         });
         // Recargar partidos y leaderboard tras sync
-        await Promise.all([loadMatches(), loadLeaderboard()]);
+        await Promise.all([loadMatches(true), loadLeaderboard(true)]);
       } else {
         setLastResult({
           ok: false,
@@ -548,6 +546,7 @@ function UsersPanel({ adminPassword }: { adminPassword: string }) {
     if (res.success) {
       alert(`✅ Se han reiniciado las predicciones de ${u.firstName} ${u.lastName}.`);
       await loadUsers();
+      useStore.getState().loadLeaderboard(true);
     } else {
       alert(`❌ Error al reiniciar: ${res.error}`);
     }
@@ -737,12 +736,8 @@ function UsersPanel({ adminPassword }: { adminPassword: string }) {
 // ============================================================
 export const AdminPage: React.FC = () => {
   const { matches, loadMatches, user } = useStore();
-  const [adminPassword, setAdminPassword] = useState(() =>
-    sessionStorage.getItem(ADMIN_PASSWORD_KEY) || ''
-  );
-  const [isAuthenticated, setIsAuthenticated] = useState(() =>
-    sessionStorage.getItem(ADMIN_STORAGE_KEY) === 'true' && !!sessionStorage.getItem(ADMIN_PASSWORD_KEY)
-  );
+  const [adminPassword, setAdminPassword] = useState('');
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [password, setPassword] = useState('');
   const [passwordError, setPasswordError] = useState('');
   const [activeSection, setActiveSection] = useState<'sync' | 'update' | 'add' | 'users'>('sync');
@@ -763,14 +758,10 @@ export const AdminPage: React.FC = () => {
     }
 
     setAdminPassword(trimmed);
-    sessionStorage.setItem(ADMIN_STORAGE_KEY, 'true');
-    sessionStorage.setItem(ADMIN_PASSWORD_KEY, trimmed);
     setIsAuthenticated(true);
   };
 
   const handleLogout = () => {
-    sessionStorage.removeItem(ADMIN_STORAGE_KEY);
-    sessionStorage.removeItem(ADMIN_PASSWORD_KEY);
     setIsAuthenticated(false);
     setPassword('');
     setAdminPassword('');

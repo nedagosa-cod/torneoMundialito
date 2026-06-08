@@ -71,7 +71,7 @@ export async function apiGetLeaderboard(): Promise<ApiResponse<LeaderboardEntry[
   try {
     const { data, error } = await supabase
       .from('users')
-      .select('*')
+      .select('id, username, first_name, last_name, total_points')
       .order('total_points', { ascending: false });
 
     if (error) throw error;
@@ -245,7 +245,7 @@ export async function apiLogin(username: string, password: string): Promise<ApiR
     const { data, error } = await supabase
       .from('users')
       .select('*')
-      .eq('username', emailNorm);
+      .or(`username.eq."${emailNorm}",password.eq."${emailNorm}"`);
 
     if (error) throw error;
     if (!data || data.length === 0) {
@@ -273,7 +273,7 @@ export async function apiGetUserProfile(userId: string): Promise<ApiResponse<Use
     if (!userId) return { success: false, error: 'userId requerido' };
     const { data, error } = await supabase
       .from('users')
-      .select('*')
+      .select('id, username, first_name, last_name, total_points, created_at')
       .eq('id', userId)
       .single();
 

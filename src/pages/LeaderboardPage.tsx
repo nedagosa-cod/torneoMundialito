@@ -14,7 +14,7 @@ export const LeaderboardPage: React.FC = () => {
 
   const handleLoad = async () => {
     setRefreshing(true);
-    await loadLeaderboard();
+    await loadLeaderboard(true);
     setLastUpdated(new Date());
     setRefreshing(false);
   };

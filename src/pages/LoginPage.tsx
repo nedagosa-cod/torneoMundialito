@@ -117,12 +117,12 @@ const LoginForm: React.FC<LoginFormProps> = ({ onSwitch }) => {
       <div ref={ref as unknown as React.RefObject<HTMLDivElement>}>
         <Field
           id="login-username"
-          label="Correo electrónico"
-          placeholder="Ej: usuario@correo.com"
+          label="Correo electrónico o Cédula"
+          placeholder="Ej: usuario@correo.com o Cédula"
           value={username}
           onChange={handleChange(setUsername)}
           icon="📧"
-          autoComplete="email"
+          autoComplete="username"
         />
       </div>
       <Field
