@@ -129,7 +129,7 @@ const LoginForm: React.FC<LoginFormProps> = ({ onSwitch }) => {
         id="login-password"
         label="Número de cédula"
         type="password"
-        placeholder="Ej: 1098769622"
+        placeholder="Ej: 1097675423"
         value={password}
         onChange={handleChange(setPassword)}
         icon="🪪"
@@ -318,8 +318,8 @@ export const LoginPage: React.FC = () => {
               type="button"
               onClick={() => switchMode('login')}
               className={`flex-1 py-2.5 rounded-xl text-xs font-black font-display transition-all duration-200 ${mode === 'login'
-                  ? 'bg-gradient-verde text-pitch-950 shadow-md'
-                  : 'text-white/40 hover:text-white/60'
+                ? 'bg-gradient-verde text-pitch-950 shadow-md'
+                : 'text-white/40 hover:text-white/60'
                 }`}
             >
               ⚽ Ingresar
@@ -329,8 +329,8 @@ export const LoginPage: React.FC = () => {
               type="button"
               onClick={() => switchMode('register')}
               className={`flex-1 py-2.5 rounded-xl text-xs font-black font-display transition-all duration-200 ${mode === 'register'
-                  ? 'bg-gradient-gold text-pitch-950 shadow-md'
-                  : 'text-white/40 hover:text-white/60'
+                ? 'bg-gradient-gold text-pitch-950 shadow-md'
+                : 'text-white/40 hover:text-white/60'
                 }`}
             >
               🏆 Registrarse
