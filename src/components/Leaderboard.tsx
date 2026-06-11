@@ -96,7 +96,17 @@ const LeaderboardRow: React.FC<LeaderboardRowProps> = ({ entry, isCurrentUser, a
 
 export const LeaderboardComponent: React.FC = () => {
   const { leaderboard, user } = useStore();
-  const myEntry = user ? leaderboard.find((e) => e.userId === user.userId) : null;
+  
+  const myEntry = user
+    ? leaderboard.find((e) => e.userId === user.userId) || (user.rank ? {
+        position: user.rank,
+        userId: user.userId,
+        username: user.username,
+        firstName: user.firstName,
+        lastName: user.lastName,
+        totalPoints: user.totalPoints
+      } : null)
+    : null;
 
   return (
     <div className="space-y-3">

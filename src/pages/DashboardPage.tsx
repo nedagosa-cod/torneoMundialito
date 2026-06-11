@@ -108,8 +108,7 @@ export const DashboardPage: React.FC = () => {
   }).length;
 
   // Encontrar el puesto en el leaderboard para el FUT Player Card
-  const myEntry = user ? leaderboard.find((e) => e.userId === user.userId) : null;
-  const myRank = myEntry ? myEntry.position : null;
+  const myRank = user?.rank || null;
 
   // Filter matches based on active tab and sub-filters
   const filteredMatches = matches.filter((m) => {

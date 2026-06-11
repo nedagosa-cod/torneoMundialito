@@ -128,6 +128,7 @@ function syncFormResponsesToSupabase() {
 
   const supabaseUsers = [];
   const seenEmails = {};
+  const seenIds = {};
   
   for (var r = 1; r < formData.length; r++) {
     var cedula = String(formData[r][colCedula] || '').trim();
@@ -136,7 +137,6 @@ function syncFormResponsesToSupabase() {
 
     if (!cedula || !correo) continue;
     if (seenEmails[correo]) continue;
-    seenEmails[correo] = true;
 
     var parts = nombreCompleto.split(/\s+/);
     var firstName = '';
@@ -159,6 +159,12 @@ function syncFormResponsesToSupabase() {
       // Registrarlo también localmente para backup
       userSheet.appendRow([userId, firstName, lastName, correo, cedula, 0, new Date().toISOString().split('T')[0]]);
     }
+
+    // Evitar IDs duplicados en el mismo lote para prevenir el error 'ON CONFLICT DO UPDATE cannot affect row a second time'
+    if (seenIds[userId]) continue;
+    
+    seenEmails[correo] = true;
+    seenIds[userId] = true;
 
     supabaseUsers.push({
       id: userId,
@@ -271,4 +277,67 @@ function formatDateValue(date) {
 
 function formatTimeValue(date) {
   return padZero(date.getHours()) + ':' + padZero(date.getMinutes());
+}
+
+// ============================================================
+//  MENÚ Y MIGRACIÓN DESDE SUPABASE
+// ============================================================
+
+function onOpen() {
+  const ui = SpreadsheetApp.getUi();
+  ui.createMenu('🏆 Polla Mundial')
+    .addItem('1. Descargar Usuarios desde Supabase (Alineación)', 'downloadUsersFromSupabase')
+    .addItem('2. Procesar Respuestas de Formulario (Sincronización)', 'syncFormResponsesToSupabase')
+    .addSeparator()
+    .addItem('3. Forzar Subida de Users locales a Supabase (Avanzado)', 'syncAllUsersToSupabase')
+    .addToUi();
+}
+
+function downloadUsersFromSupabase() {
+  const url = SUPABASE_URL + '/rest/v1/users?select=id,first_name,last_name,username,password,total_points,created_at&order=created_at.asc';
+  const options = {
+    method: 'get',
+    headers: {
+      'apikey': SUPABASE_ANON_KEY,
+      'Authorization': 'Bearer ' + SUPABASE_ANON_KEY
+    },
+    muteHttpExceptions: true
+  };
+  const response = UrlFetchApp.fetch(url, options);
+  const code = response.getResponseCode();
+  if (code < 200 || code >= 300) {
+    throw new Error('Supabase error (' + code + '): ' + response.getContentText());
+  }
+  
+  const users = JSON.parse(response.getContentText());
+  const userSheet = getSheet(SHEET_USERS);
+  
+  // Limpiar la hoja y poner los encabezados
+  userSheet.clearContents();
+  userSheet.getRange(1, 1, 1, 7).setValues([
+    ['userId', 'firstName', 'lastName', 'username', 'password', 'totalPoints', 'createdAt']
+  ]);
+  
+  if (users.length > 0) {
+    const rows = users.map(function(u) {
+      let createdDate = '';
+      if (u.created_at) {
+        try {
+          createdDate = u.created_at.split('T')[0];
+        } catch (e) {}
+      }
+      return [
+        u.id,
+        u.first_name || '',
+        u.last_name || '',
+        u.username || '',
+        u.password || '',
+        u.total_points || 0,
+        createdDate
+      ];
+    });
+    userSheet.getRange(2, 1, rows.length, 7).setValues(rows);
+  }
+  Logger.log('Se descargaron y guardaron ' + users.length + ' usuarios de Supabase.');
+  return 'Descargados ' + users.length + ' usuarios con éxito.';
 }

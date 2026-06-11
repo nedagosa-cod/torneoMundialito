@@ -18,6 +18,7 @@ function mapUser(u: any): User {
     username: u.username,
     totalPoints: u.total_points || 0,
     createdAt: u.created_at,
+    rank: u.rank,
   };
 }
 
@@ -72,7 +73,8 @@ export async function apiGetLeaderboard(): Promise<ApiResponse<LeaderboardEntry[
     const { data, error } = await supabase
       .from('users')
       .select('id, username, first_name, last_name, total_points')
-      .order('total_points', { ascending: false });
+      .order('total_points', { ascending: false })
+      .limit(20);
 
     if (error) throw error;
 
@@ -261,7 +263,15 @@ export async function apiLogin(username: string, password: string): Promise<ApiR
       return { success: false, error: 'Número de cédula incorrecto', code: 401 };
     }
 
-    return { success: true, data: mapUser(user) };
+    // Calcular rango del usuario
+    const { count } = await supabase
+      .from('users')
+      .select('*', { count: 'exact', head: true })
+      .gt('total_points', user.total_points || 0);
+
+    const rank = (count || 0) + 1;
+
+    return { success: true, data: mapUser({ ...user, rank }) };
   } catch (err: any) {
     return { success: false, error: err.message || 'Error al iniciar sesión' };
   }
@@ -278,7 +288,16 @@ export async function apiGetUserProfile(userId: string): Promise<ApiResponse<Use
       .single();
 
     if (error) throw error;
-    return { success: true, data: mapUser(data) };
+
+    // Calcular rango del usuario
+    const { count } = await supabase
+      .from('users')
+      .select('*', { count: 'exact', head: true })
+      .gt('total_points', data.total_points || 0);
+
+    const rank = (count || 0) + 1;
+
+    return { success: true, data: mapUser({ ...data, rank }) };
   } catch (err: any) {
     return { success: false, error: err.message || 'Error al obtener perfil de usuario' };
   }

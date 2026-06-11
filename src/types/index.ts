@@ -9,6 +9,7 @@ export interface User {
   username: string;       // Nombre de jugador (display)
   totalPoints: number;
   createdAt: string;
+  rank?: number;
 }
 
 export type MatchStatus = 'upcoming' | 'live' | 'finished';
