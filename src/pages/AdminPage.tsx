@@ -752,7 +752,7 @@ export const AdminPage: React.FC = () => {
     const trimmed = password.trim();
     if (!trimmed) { setPasswordError('Ingresa la contraseña'); return; }
 
-    if (trimmed !== 'mundial2026') {
+    if (trimmed !== 'mundial2026++') {
       setPasswordError('Contraseña incorrecta');
       return;
     }

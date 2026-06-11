@@ -188,7 +188,7 @@ export async function apiSyncMatches(adminPassword: string): Promise<ApiResponse
   error?: string;
 }>> {
   try {
-    if (adminPassword !== 'mundial2026') {
+    if (adminPassword !== 'mundial2026++') {
       return { success: false, error: 'Contraseña de admin incorrecta' };
     }
 
@@ -404,7 +404,7 @@ export interface UpdateMatchParams {
 
 export async function apiUpdateMatch(params: UpdateMatchParams): Promise<ApiResponse<{ matchId: string }>> {
   try {
-    if (params.adminPassword !== 'mundial2026') {
+    if (params.adminPassword !== 'mundial2026++') {
       return { success: false, error: 'Contraseña de administrador incorrecta' };
     }
 
@@ -474,7 +474,7 @@ export async function apiAddMatch(
   group: string,
 ): Promise<ApiResponse<Match>> {
   try {
-    if (adminPassword !== 'mundial2026') {
+    if (adminPassword !== 'mundial2026++') {
       return { success: false, error: 'Contraseña incorrecta' };
     }
 
@@ -506,7 +506,7 @@ export async function apiAddMatch(
 /** Reiniciar las predicciones de un usuario */
 export async function apiResetUserPredictions(adminPassword: string, userId: string): Promise<ApiResponse<void>> {
   try {
-    if (adminPassword !== 'mundial2026') {
+    if (adminPassword !== 'mundial2026++') {
       return { success: false, error: 'Contraseña de administrador incorrecta' };
     }
     if (!userId) {
